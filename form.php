@@ -1,0 +1,43 @@
+<?php
+header('Content-Type: text/html; charset=utf-8');
+?>
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valttikortin lomake</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <form id="card-form">
+    <h1>Valttikorttilomake</h1>
+
+    <div class="form-group">
+      <label for="firstName">Etunimi</label>
+      <input type="text" id="firstName" name="firstName" required>
+    </div>
+    <div class="form-group">
+      <label for="lastName">Sukunimi</label>
+      <input type="text" id="lastName" name="lastName" required>
+    </div>
+
+    <div class="form-group">
+      <label>Lisää kuva valttikortista</label>
+      <div class="camera-frame" id="cameraFrame"></div>
+      <div class="controls">
+        <button type="button" id="openCamera">Avaa kamera</button>
+        <button type="button" id="capture" disabled>Ota kuva</button>
+      </div>
+      <div class="preview" id="preview"></div>
+      <input type="hidden" name="cardImage" id="cardImageInput">
+    </div>
+
+    <div class="controls">
+      <button type="submit">Lähetä lomake</button>
+    </div>
+  </form>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
