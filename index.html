@@ -3,11 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Valttikortti Lomake</title>
-  <!-- Automaattinen uudelleenohjaus lomakesivulle -->
-  <meta http-equiv="refresh" content="0; url=form.php">
+  <title>Valttikortin lomake</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="script.js" defer></script>
 </head>
 <body>
-  <p>Ohjataan lomakkeeseen... Jos uudelleenohjaus ei toimi, <a href="form.php">klikkaa tästä</a>.</p>
+  <form id="card-form">
+    <h1>Valttikorttilomake</h1>
+
+    <div class="form-group">
+      <label for="firstName">Etunimi</label>
+      <input type="text" id="firstName" name="firstName" required>
+    </div>
+    <div class="form-group">
+      <label for="lastName">Sukunimi</label>
+      <input type="text" id="lastName" name="lastName" required>
+    </div>
+
+    <div class="form-group">
+      <label>Lisää kuva valttikortista</label>
+      <div class="camera-frame" id="cameraFrame"></div>
+      <div class="controls">
+        <button type="button" id="openCamera">Avaa kamera</button>
+        <button type="button" id="capture" disabled>Ota kuva</button>
+      </div>
+      <div class="preview" id="preview"></div>
+      <input type="hidden" name="cardImage" id="cardImageInput">
+    </div>
+
+    <div class="controls">
+      <button type="submit">Lähetä lomake</button>
+    </div>
+  </form>
 </body>
 </html>
