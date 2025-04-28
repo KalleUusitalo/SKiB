@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <!-- EmailJS SDK -->
   <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+  <!-- Pääsovelluslogiikka -->
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
@@ -40,10 +41,11 @@
       <button type="submit">Lähetä lomake</button>
     </div>
   </form>
+
   <script>
-    // Alusta EmailJS
+    // Alusta EmailJS julkisella avaimella
     (function(){
-      emailjs.init("YOUR_EMAILJS_USER_ID");
+      emailjs.init("GrJbR0Z9xXufM9WoR");
     })();
   </script>
 </body>
