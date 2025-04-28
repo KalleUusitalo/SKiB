@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Valttikortin lomake</title>
   <link rel="stylesheet" href="style.css">
-  <!-- QuaggaJS viivakoodien skannaukseen -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
   <!-- Pääsovelluslogiikka -->
   <script type="module" src="script.js" defer></script>
 </head>
@@ -34,19 +32,6 @@
       </div>
       <div class="preview" id="preview"></div>
       <input type="hidden" name="cardImage" id="cardImageInput">
-    </div>
-
-    <!-- NFC-luku (Android Chrome) -->
-    <div class="form-group">
-      <button type="button" id="readNfc">Lue NFC-kortti</button>
-      <div id="nfcResult">Ei dataa</div>
-    </div>
-
-    <!-- Viivakoodin skannaus (EAN/Code128) -->
-    <div class="form-group">
-      <button type="button" id="startScan">Käynnistä viivakoodin skannaus</button>
-      <video id="barcodeVideo" autoplay playsinline></video>
-      <div id="barcodeResult">Ei koodia</div>
     </div>
 
     <!-- Lähetys -->
