@@ -19,9 +19,7 @@
       padding: 0;
       overflow-x: hidden;
     }
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
       background: var(--bg-light);
@@ -34,10 +32,7 @@
       text-align: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
+    header h1 { margin: 0; font-size: 2rem; }
     main {
       max-width: 900px;
       margin: var(--spacing) auto;
@@ -62,29 +57,18 @@
       gap: var(--spacing);
     }
     @media (min-width: 600px) {
-      .form-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      .form-grid { grid-template-columns: 1fr 1fr; }
     }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-    label {
-      font-weight: bold;
-      margin-bottom: 0.5em;
-    }
+    .form-group { display: flex; flex-direction: column; }
+    label { font-weight: bold; margin-bottom: 0.5em; }
     input, select, textarea, button, canvas {
       font-size: 1rem;
       padding: 0.5em;
       border: 1px solid #ccc;
       border-radius: var(--radius);
-      width: 100%;
-      max-width: 100%;
+      width: 100%; max-width: 100%;
     }
-    input:invalid, select:invalid {
-      border-color: red;
-    }
+    input:invalid, select:invalid { border-color: red; }
     button {
       margin-top: var(--spacing);
       background: var(--primary-color);
@@ -93,100 +77,23 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    button:hover {
-      background: var(--primary-hover);
-    }
-    .btn-group {
-      display: flex;
-      gap: var(--spacing);
-    }
-    .hidden {
-      display: none;
-    }
-    ul {
-      padding-left: 1em;
-      margin: 0;
-    }
-    a {
-      color: var(--primary-color);
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    /* Input + barcode icon */
-    .barcode-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .barcode-wrapper input {
-      padding-right: 2.5em;
-    }
-    .barcode-icon {
-      position: absolute;
-      right: 0.5em;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      font-size: 1.2em;
-      cursor: pointer;
-      color: var(--primary-color);
-    }
-    /* Signature canvas */
-    canvas.signature {
-      border: 1px solid #ccc;
-      cursor: crosshair;
-      height: 200px;
-      width: 100%;
-    }
-    /* Modals */
-    #camera-modal, #barcode-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.9);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #camera-modal.hidden, #barcode-modal.hidden {
-      display: none;
-    }
-    #camera-video, #barcode-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .camera-overlay, .barcode-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      height: 190px;
-      margin-left: -150px;
-      margin-top: -95px;
-      box-shadow: 0 0 0 2000px rgba(255,255,255,0.8);
-      border: 2px dashed var(--primary-color);
-      border-radius: 8px;
-    }
-    .camera-controls, .barcode-controls {
-      position: absolute;
-      bottom: var(--spacing);
-      display: flex;
-      gap: var(--spacing);
-    }
+    button:hover { background: var(--primary-hover); }
+    .btn-group { display: flex; gap: var(--spacing); }
+    .hidden { display: none; }
+    ul { padding-left: 1em; margin: 0; }
+    a { color: var(--primary-color); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    canvas.signature { border: 1px solid #ccc; cursor: crosshair; height: 200px; width: 100%; }
+    #camera-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+    #camera-modal.hidden { display: none; }
+    #camera-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+    .camera-overlay { position: absolute; top: 50%; left: 50%; width: 300px; height: 190px; margin-left: -150px; margin-top: -95px; box-shadow: 0 0 0 2000px rgba(255,255,255,0.8); border: 2px dashed var(--primary-color); border-radius: 8px; }
+    .camera-controls { position: absolute; bottom: var(--spacing); display: flex; gap: var(--spacing); }
   </style>
-  <!-- Barcode library -->
-  <script src="https://unpkg.com/@zxing/library@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+  <script>
+    (function() { emailjs.init('GrJbR0Z9xXufM9WoR'); })();
+  </script>
 </head>
 <body>
   <header>
@@ -203,13 +110,9 @@
           <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank">Suorita perehdytys tästä</a>
         </div>
         <div class="form-grid">
-          <div class="form-group barcode-wrapper">
+          <div class="form-group">
             <label for="valtti">1. VALTTI-kortin numero (12 numeroa)</label>
-            <input id="valtti" name="valtti" type="text" inputmode="numeric"
-                   pattern="\d{12}" required placeholder="123456789012" />
-            <button type="button" class="barcode-icon" id="open-barcode">
-              &#128438;
-            </button>
+            <input id="valtti" name="valtti" type="text" inputmode="numeric" pattern="\d{12}" required placeholder="123456789012" />
           </div>
           <div class="form-group">
             <button type="button" id="open-camera">Ota kuva kortista</button>
@@ -218,8 +121,7 @@
           </div>
           <div class="form-group">
             <label for="veronumero">2. Veronumero (12 numeroa, jos ei Valttia)</label>
-            <input id="veronumero" name="veronumero" type="text" inputmode="numeric"
-                   pattern="\d{12}" placeholder="100012345678" />
+            <input id="veronumero" name="veronumero" type="text" inputmode="numeric" pattern="\d{12}" placeholder="100012345678" />
           </div>
           <div class="form-group">
             <label for="yritys">3. Yritys (palkan maksava yritys)</label>
@@ -256,8 +158,7 @@
           </div>
           <div class="form-group">
             <label for="puhelin">8. Puhelinnumero</label>
-            <input id="puhelin" name="puhelin" type="tel" required
-                   placeholder="+358 44 123 1234" />
+            <input id="puhelin" name="puhelin" type="tel" required placeholder="+358 44 123 1234" />
           </div>
           <div class="form-group">
             <label for="sahkoposti">9. Sähköposti</label>
@@ -275,20 +176,15 @@
             </select>
           </div>
           <div class="form-group hidden" id="kouluyhteyshenkilo_group">
-            <label for="kouluyhteyshenkilo">
-              11. Jos olet harjoittelija, koulun yhteyshenkilö
-            </label>
-            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo"
-                   type="text" placeholder="Nimi ja puhelinnumero" />
+            <label for="kouluyhteyshenkilo">11. Koulun yhteyshenkilö (harjoittelija)</label>
+            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero" />
           </div>
           <div class="form-group">
             <label for="kansalaisuus">12. Kansalaisuus</label>
             <select id="kansalaisuus" name="kansalaisuus" required>
               <option value="">-- Valitse --</option>
-              <option value="foreign">
-                FOREIGN PERSONS: Complete orientation from the link
-              </option>
               <option value="suomi">Suomi</option>
+              <option value="foreign">Foreign Persons</option>
             </select>
           </div>
           <div class="form-group">
@@ -298,63 +194,59 @@
         </div>
       </section>
 
-      <!-- Osa 2 – Perehdytyksen tavoitteet -->
+      <!-- Osa 2 -->
       <section>
         <h2>Osa 2 – Perehdytyksen tavoitteet</h2>
-        <p>Perehdytyksellä varmistetaan, että työntekijä ymmärtää:</p>
+        <p>Perehdytyksen tavoitteena on varmistaa työntekijän turvallisuus ja tehokkuus työmaalla:</p>
         <ul>
-          <li>Työturvallisuuden merkityksen ja vastuunsa</li>
-          <li>Työmaan asiat ja pelisäännöt</li>
-          <li>Kohdekohtaiset riskit ja vaaratekijät</li>
-          <li>Oikeat työtavat</li>
-          <li>Tulostus- ja paloturvallisuusperiaatteet</li>
+          <li>Työturvallisuuden merkitys ja vastuunkanto</li>
+          <li>Työmaan säännöt ja pelisäännöt</li>
+          <li>Käytännön työvaiheet ja riskikohdat</li>
+          <li>Henkilösuojaimet ja suojavälineet</li>
+          <li>Pelastus- ja ensiapumenettelyt</li>
         </ul>
       </section>
 
-      <!-- Osa 3 – Perehdytysvastuut -->
+      <!-- Osa 3 -->
       <section>
         <h2>Osa 3 – Perehdytysvastuut</h2>
         <ul>
           <li><strong>Pääurakoitsija:</strong> Vastaa kokonaisuudesta ja valvonnasta</li>
-          <li><strong>Työnjohtaja:</strong> Huolehtii aliurakoitsijoiden perehdytyksestä</li>
-          <li><strong>Perehdyttäjä:</strong> Suorittaa varsinaisen esittelyn</li>
-          <li><strong>Työntekijä:</strong> Osallistuu aktiivisesti ja esittää kysymyksiä</li>
+          <li><strong>Työnjohtaja:</strong> Varmistaa aliurakoitsijoiden perehdytyksen</li>
+          <li><strong>Perehdyttäjä:</strong> Suorittaa kohde-esittelyn työntekijälle</li>
+          <li><strong>Työntekijä:</strong> Osallistuu ja ilmoittaa havaitsemistaan riskeistä</li>
         </ul>
       </section>
 
-      <!-- Osa 4 – Perehdytyksen sisältö -->
+      <!-- Osa 4 -->
       <section>
         <h2>Osa 4 – Perehdytyksen sisältö</h2>
         <ul>
-          <li>Työmaatilat, kulkureitit ja varastointipaikat</li>
-          <li>Työmaan organisaatio ja vastuuhenkilöt</li>
-          <li>Pelastus- ja ensiapusuunnitelmat</li>
-          <li>Henkilösuojaimet ja niiden käyttö</li>
-          <li>Työturvallisuusohjeet ja riskienhallinta</li>
-          <li>Jätteiden- ja puhtaudenhallinta</li>
-          <li>Kosteudenhallinta</li>
+          <li>Työmaan tilat ja kulkureitit</li>
+          <li>Varastointi ja logistiset reitit</li>
+          <li><strong>Jätteiden- ja puhtaudenhallinta:</strong> P1-vaihe</li>
+          <li>Kosteudenhallinta ja ympäristönäkökohdat</li>
+          <li>Tulityöt ja paloturvallisuus</li>
+          <li>Sähkötyöt ja nostotyöt</li>
         </ul>
       </section>
 
-      <!-- Osa 5 – Työmaakierrokset ja riskikartoitus -->
+      <!-- Osa 5 -->
       <section>
-        <h2>Osa 5 – Työmaakierrokset ja riskikartoitus</h2>
-        <p>Työmaakierroksella käydään läpi:</p>
+        <h2>Osa 5 – Työmaakierros ja riskikartoitus</h2>
         <ul>
           <li>Kulkureitit ja poistumistiet</li>
-          <li>Työskentelyalueet ja aitaukset</li>
-          <li>Nosturi- ja nostoalueet</li>
-          <li>Sähkö- ja automaatiotilojen riskit</li>
-          <li>Erityisalueet (kosteus, pöly, melu)</li>
+          <li>Tontin rajat ja aitaus</li>
+          <li>Nosturityöt ja nostokalusto</li>
+          <li>Erityisalueiden riskit (kosteus, pöly, melu)</li>
         </ul>
       </section>
 
-      <!-- Osa 6 – Pelastautuminen ja ensiapu -->
+      <!-- Osa 6 -->
       <section>
-        <h2>Osa 6 – Pelastautuminen ja ensiapu</h2>
+        <h2>Osa 6 – Pelastus ja ensiapu</h2>
         <p><strong>Hätänumero:</strong> 112</p>
         <p><strong>Kokoontumispaikka:</strong> Liisantori</p>
-        <p><strong>Ensiapupisteet:</strong></p>
         <ul>
           <li>Taukotila</li>
           <li>Miesten sosiaalitila</li>
@@ -363,11 +255,11 @@
         </ul>
       </section>
 
-      <!-- Osa 7 – Henkilösuojaimet -->
+      <!-- Osa 7 -->
       <section>
         <h2>Osa 7 – Henkilösuojaimet</h2>
         <ul>
-          <li>CE/EN397-kypärä ja leukahihna</li>
+          <li>CE/EN397-kypärä leukahihnalla</li>
           <li>Suojalasit</li>
           <li>Turvakengät naulasuojilla</li>
           <li>Kuulosuojaimet</li>
@@ -375,35 +267,34 @@
         </ul>
       </section>
 
-      <!-- Osa 8 – Jätteiden- ja puhtaudenhallinta -->
+      <!-- Osa 8 -->
       <section>
-        <h2>Osa 8 – Jätteiden- ja puhtaudenhallinta</h2>
+        <h2>Osa 8 – Jätteiden hallinta</h2>
         <ul>
-          <li>P1-puhtausluokka runko- ja peruskorjausvaiheessa</li>
+          <li>P1-vaiheen puhtausvaatimukset</li>
           <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli, pahvi, kipsilevy, vaaralliset</li>
-          <li>Omat siivousvälineet ja –vastuu jokaisella urakoitsijalla</li>
         </ul>
       </section>
 
-      <!-- Osa 9 – Kosteudenhallinta -->
+      <!-- Osa 9 -->
       <section>
         <h2>Osa 9 – Kosteudenhallinta</h2>
-        <p>Tavoitteena estää kosteusvauriot. Noudata suunnitelmia ja ilmoita poikkeamista välittömästi.</p>
+        <p>Tavoite: estää kosteusvauriot. Noudata suunnitelmia ja raportoi poikkeamat.</p>
       </section>
 
-      <!-- Osa 10 – Työturvallisuushavainnot -->
+      <!-- Osa 10 -->
       <section>
         <h2>Osa 10 – Työturvallisuushavainnot</h2>
-        <p>Raportoi havainnot osoitteessa <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a>. Tarkista viikoittain ja asiakirjat arkistoitava.</p>
+        <p>Ilmoita havainnoista <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a>.</p>
       </section>
 
-      <!-- Osa 11 – Työmaan henkilöstö ja organisaatio -->
+      <!-- Osa 11 -->
       <section>
-        <h2>Osa 11 – Työmaan henkilöstö ja organisaatio</h2>
+        <h2>Osa 11 – Henkilöstö ja organisaatio</h2>
         <ul>
           <li>Veli-Matti Järvenpää – Vastaava työnjohtaja (050 521 8333)</li>
           <li>Mika Kangasniemi – Työsuojelupäällikkö (050 305 1492)</li>
-          <li>Joonas Kekki – Työsuojelukoordinaattori, Prepon Oy (050 436 9411)</li>
+          <li>Joonas Kekki – Työsuojelukoordinaattori (050 436 9411)</li>
           <li>Antti Puhakka – Työsuojeluvaltuutettu (050 592 6259)</li>
           <li>Kalle Uusitalo – Työmaainsinööri (044 401 3286)</li>
           <li>Teemu Riita – Työnjohtaja (040 072 2022)</li>
@@ -412,9 +303,9 @@
         </ul>
       </section>
 
-      <!-- Osa 12 – Hyväksyntä -->
+      <!-- Osa 12 -->
       <section>
-        <h2>Osa 12 – Hyväksyntä</h2>
+        <h2>Osa 12 – Allekirjoitus</h2>
         <div class="form-group">
           <label for="signature-pad">22. Allekirjoitus</label>
           <canvas id="signature-pad" class="signature"></canvas>
@@ -437,16 +328,6 @@
         <button type="button" id="close-camera">Peruuta</button>
       </div>
     </div>
-
-    <!-- Barcode Modal -->
-    <div id="barcode-modal" class="hidden">
-      <video id="barcode-video" autoplay playsinline></video>
-      <div class="barcode-overlay"></div>
-      <div class="barcode-controls">
-        <button type="button" id="close-barcode">Peruuta</button>
-      </div>
-    </div>
-
   </main>
 
   <script>
@@ -470,44 +351,27 @@
     window.addEventListener('resize', resizeSignature);
     resizeSignature();
     function startSig(e) {
-      e.preventDefault();
-      drawing = true;
+      e.preventDefault(); drawing = true;
       origOverflow = body.style.overflow;
       body.style.overflow = 'hidden';
       const rect = canvasSig.getBoundingClientRect();
       lastX = (e.clientX||e.touches[0].clientX) - rect.left;
       lastY = (e.clientY||e.touches[0].clientY) - rect.top;
     }
-    function endSig() {
-      drawing = false;
-      body.style.overflow = origOverflow;
-    }
+    function endSig() { drawing = false; body.style.overflow = origOverflow; }
     function moveSig(e) {
       if (!drawing) return;
       e.preventDefault();
       const rect = canvasSig.getBoundingClientRect();
       const x = (e.clientX||e.touches[0].clientX) - rect.left;
       const y = (e.clientY||e.touches[0].clientY) - rect.top;
-      ctxSig.beginPath();
-      ctxSig.moveTo(lastX, lastY);
-      ctxSig.lineTo(x, y);
-      ctxSig.stroke();
+      ctxSig.beginPath(); ctxSig.moveTo(lastX, lastY); ctxSig.lineTo(x, y); ctxSig.stroke();
       lastX = x; lastY = y;
     }
-    ['pointerdown','touchstart'].forEach(evt => canvasSig.addEventListener(evt, startSig));
-    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt => canvasSig.addEventListener(evt, endSig));
-    ['pointermove','touchmove'].forEach(evt => canvasSig.addEventListener(evt, moveSig));
-    document.getElementById('clear-signature').addEventListener('click', resizeSignature);
-    document.getElementById('orientationForm').addEventListener('submit', e => {
-      const rect = canvasSig.getBoundingClientRect();
-      const data = ctxSig.getImageData(0, 0, rect.width, rect.height).data;
-      if (!data.some(v => v !== 0)) {
-        e.preventDefault();
-        alert('Ole hyvä ja allekirjoita ennen lähettämistä.');
-        return;
-      }
-      document.getElementById('signature_data').value = canvasSig.toDataURL();
-    });
+    ['pointerdown','touchstart'].forEach(evt=>canvasSig.addEventListener(evt,startSig));
+    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt=>canvasSig.addEventListener(evt,endSig));
+    ['pointermove','touchmove'].forEach(evt=>canvasSig.addEventListener(evt,moveSig));
+    document.getElementById('clear-signature').addEventListener('click',resizeSignature);
 
     // Camera modal
     const openCam = document.getElementById('open-camera');
@@ -518,86 +382,35 @@
     const cardInput = document.getElementById('card_photo_data');
     const cardPreview = document.getElementById('card-photo-preview');
     let camStream;
-
-    openCam.addEventListener('click', async () => {
+    openCam.addEventListener('click',async()=>{
       camModal.classList.remove('hidden');
       try {
-        camStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 2160 } }
-        });
+        camStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:'environment',width:{ideal:4096},height:{ideal:2160}} });
         video.srcObject = camStream;
-      } catch(err) {
-        alert('Kameran käyttö ei onnistu: ' + err.message);
-        camModal.classList.add('hidden');
-      }
+      } catch(err) { alert('Kameran käyttö ei onnistu: '+err.message); camModal.classList.add('hidden'); }
     });
-    takeBtn.addEventListener('click', () => {
-      const w = video.videoWidth, h = video.videoHeight;
-      const tmp = document.createElement('canvas');
-      tmp.width = w; tmp.height = h;
-      tmp.getContext('2d').drawImage(video,0,0,w,h);
-      const cropRect = document.querySelector('.camera-overlay').getBoundingClientRect();
-      const vidRect = video.getBoundingClientRect();
-      const scaleX = w/vidRect.width, scaleY = h/vidRect.height;
-      const x = (cropRect.left-vidRect.left)*scaleX;
-      const y = (cropRect.top-vidRect.top)*scaleY;
-      const cw = cropRect.width*scaleX, ch = cropRect.height*scaleY;
-      const crop = document.createElement('canvas');
-      crop.width=cw; crop.height=ch;
-      crop.getContext('2d').drawImage(tmp,x,y,cw,ch,0,0,cw,ch);
-      const url = crop.toDataURL('image/png');
-      cardInput.value = url;
-      cardPreview.src = url; cardPreview.classList.remove('hidden');
-      camModal.classList.add('hidden');
-      camStream.getTracks().forEach(t=>t.stop());
+    takeBtn.addEventListener('click',()=>{
+      const w=video.videoWidth,h=video.videoHeight,tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(video,0,0,w,h);
+      const rect=document.querySelector('.camera-overlay').getBoundingClientRect(),vidRect=video.getBoundingClientRect();
+      const scaleX=w/vidRect.width,scaleY=h/vidRect.height,x=(rect.left-vidRect.left)*scaleX,y=(rect.top-vidRect.top)*scaleY,cw=rect.width*scaleX,ch=rect.height*scaleY;
+      const crop=document.createElement('canvas');crop.width=cw;crop.height=ch;crop.getContext('2d').drawImage(tmp,x,y,cw,ch,0,0,cw,ch);
+      const url=crop.toDataURL('image/png');cardInput.value=url;cardPreview.src=url;cardPreview.classList.remove('hidden');camModal.classList.add('hidden');camStream.getTracks().forEach(t=>t.stop());
     });
-    closeCam.addEventListener('click', () => {
-      camModal.classList.add('hidden');
-      if(camStream) camStream.getTracks().forEach(t=>t.stop());
+    closeCam.addEventListener('click',()=>{ camModal.classList.add('hidden'); if(camStream) camStream.getTracks().forEach(t=>t.stop()); });
+
+    // Show trainee contact
+    document.getElementById('rooli').addEventListener('change',e=>{
+      const grp=document.getElementById('kouluyhteyshenkilo_group');
+      if(e.target.value==='Harjoittelija'){ grp.classList.remove('hidden'); grp.querySelector('input').required=true;} else{ grp.classList.add('hidden'); grp.querySelector('input').required=false; }
     });
 
-    // Barcode modal
-    const openBarcode = document.getElementById('open-barcode');
-    const bcModal = document.getElementById('barcode-modal');
-    const bcVideo = document.getElementById('barcode-video');
-    const closeBarcode = document.getElementById('close-barcode');
-    const codeReader = new ZXing.BrowserBarcodeReader();
-    let bcStream;
-
-    openBarcode.addEventListener('click', async () => {
-      bcModal.classList.remove('hidden');
-      try {
-        bcStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        bcVideo.srcObject = bcStream;
-        codeReader.decodeFromVideoElement(bcVideo, (result, err) => {
-          if (result) {
-            document.getElementById('valtti').value = result.text;
-            bcModal.classList.add('hidden');
-            codeReader.reset();
-            bcStream.getTracks().forEach(t=>t.stop());
-          }
-        });
-      } catch(err) {
-        alert('Viivakoodin skannaus ei onnistu: '+err.message);
-        bcModal.classList.add('hidden');
-      }
-    });
-    closeBarcode.addEventListener('click', () => {
-      bcModal.classList.add('hidden');
-      codeReader.reset();
-      if(bcStream) bcStream.getTracks().forEach(t=>t.stop());
-    });
-
-    // Show/hide trainee contact
-    document.getElementById('rooli').addEventListener('change', e => {
-      const grp = document.getElementById('kouluyhteyshenkilo_group');
-      if (e.target.value === 'Harjoittelija') {
-        grp.classList.remove('hidden');
-        grp.querySelector('input').required = true;
-      } else {
-        grp.classList.add('hidden');
-        grp.querySelector('input').required = false;
-      }
+    // EmailJS submission
+    document.getElementById('orientationForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      emailjs.sendForm('service_bvdu9lj','template_xjrzbhe', this)
+        .then(() => alert('Lomake lähetetty!'),
+              err => alert('Lähetys epäonnistui: ' + JSON.stringify(err))
+        );
     });
   </script>
 </body>
