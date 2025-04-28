@@ -96,6 +96,10 @@
     button:hover {
       background: var(--primary-hover);
     }
+    .btn-group {
+      display: flex;
+      gap: var(--spacing);
+    }
     .hidden {
       display: none;
     }
@@ -110,7 +114,6 @@
     a:hover {
       text-decoration: underline;
     }
-
     /* Signature canvas */
     canvas.signature {
       border: 1px solid #ccc;
@@ -118,7 +121,6 @@
       height: 200px;
       width: 100%;
     }
-
     /* Camera modal */
     #camera-modal {
       position: fixed;
@@ -163,6 +165,8 @@
       gap: var(--spacing);
     }
   </style>
+  <!-- ZXing barcode scanning library -->
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
 </head>
 <body>
   <header>
@@ -183,7 +187,15 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="valtti">1. VALTTI-kortin numero (12 numeroa)</label>
-            <input id="valtti" name="valtti" type="text" inputmode="numeric" pattern="\d{12}" required placeholder="123456789012" />
+            <input
+              id="valtti"
+              name="valtti"
+              type="text"
+              inputmode="numeric"
+              pattern="\d{12}"
+              required
+              placeholder="123456789012"
+            />
           </div>
           <div class="form-group">
             <button type="button" id="open-camera">Ota kuva kortista</button>
@@ -192,7 +204,14 @@
           </div>
           <div class="form-group">
             <label for="veronumero">2. Veronumero (12 numeroa, jos ei Valttia)</label>
-            <input id="veronumero" name="veronumero" type="text" inputmode="numeric" pattern="\d{12}" placeholder="100012345678" />
+            <input
+              id="veronumero"
+              name="veronumero"
+              type="text"
+              inputmode="numeric"
+              pattern="\d{12}"
+              placeholder="100012345678"
+            />
           </div>
           <div class="form-group">
             <label for="yritys">3. Yritys (palkan maksava yritys)</label>
@@ -229,7 +248,13 @@
           </div>
           <div class="form-group">
             <label for="puhelin">8. Puhelinnumero</label>
-            <input id="puhelin" name="puhelin" type="tel" required placeholder="+358 44 123 1234" />
+            <input
+              id="puhelin"
+              name="puhelin"
+              type="tel"
+              required
+              placeholder="+358 44 123 1234"
+            />
           </div>
           <div class="form-group">
             <label for="sahkoposti">9. Sähköposti</label>
@@ -247,14 +272,23 @@
             </select>
           </div>
           <div class="form-group hidden" id="kouluyhteyshenkilo_group">
-            <label for="kouluyhteyshenkilo">11. Jos olet harjoittelija, koulun yhteyshenkilö</label>
-            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero" />
+            <label for="kouluyhteyshenkilo">
+              11. Jos olet harjoittelija, koulun yhteyshenkilö
+            </label>
+            <input
+              id="kouluyhteyshenkilo"
+              name="kouluyhteyshenkilo"
+              type="text"
+              placeholder="Nimi ja puhelinnumero"
+            />
           </div>
           <div class="form-group">
             <label for="kansalaisuus">12. Kansalaisuus</label>
             <select id="kansalaisuus" name="kansalaisuus" required>
               <option value="">-- Valitse --</option>
-              <option value="foreign">FOREIGN PERSONS: Complete orientation from the link</option>
+              <option value="foreign">
+                FOREIGN PERSONS: Complete orientation from the link
+              </option>
               <option value="suomi">Suomi</option>
             </select>
           </div>
@@ -267,24 +301,50 @@
             <input id="kieli" name="kieli" type="text" required />
           </div>
           <div class="form-group">
-            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa (kk/vvvv)</label>
-            <input id="ttkortti_voi" name="ttkortti_voi" type="text" required placeholder="08/2025" />
+            <label for="ttkortti_voi">
+              15. Työturvallisuuskortti voimassa (kk/vvvv)
+            </label>
+            <input
+              id="ttkortti_voi"
+              name="ttkortti_voi"
+              type="text"
+              required
+              placeholder="08/2025"
+            />
           </div>
           <div class="form-group">
             <label for="ttkortti_num">16. Työturvallisuuskortin numero</label>
-            <input id="ttkortti_num" name="ttkortti_num" type="text" inputmode="numeric" pattern="\d+" />
+            <input
+              id="ttkortti_num"
+              name="ttkortti_num"
+              type="text"
+              inputmode="numeric"
+              pattern="\d+"
+            />
           </div>
           <div class="form-group">
-            <label for="tko_voi">17. Tulityökortti voimassa (kk/vuosi) (tarvittaessa)</label>
-            <input id="tko_voi" name="tko_voi" type="text" placeholder="mm/vuosi" />
+            <label for="tko_voi">
+              17. Tulityökortti voimassa (kk/vuosi) (tarvittaessa)
+            </label>
+            <input
+              id="tko_voi"
+              name="tko_voi"
+              type="text"
+              placeholder="mm/vuosi"
+            />
           </div>
           <div class="form-group">
             <label for="tko_num">18. Tulityökortin numero</label>
-            <input id="tko_num" name="tko_num" type="text" inputmode="numeric" pattern="\d+" />
+            <input
+              id="tko_num"
+              name="tko_num"
+              type="text"
+              inputmode="numeric"
+              pattern="\d+"
+            />
           </div>
         </div>
       </section>
-
       <!-- Osa 2 -->
       <section>
         <h2>Osa 2 – Kohteen yleisesittely</h2>
@@ -304,14 +364,22 @@
           <li>Sähköurakoitsija: Mekeltek Oy</li>
         </ul>
       </section>
-
       <!-- Osa 3 -->
       <section>
         <h2>Osa 3 – Tietoa kohteesta</h2>
-        <p>Bss + SKiB Kampus on Porin ruotsinkielisen yhtenäiskoulun (Bss) ja Svenska Kulturfonden i Björneborg-säätiön uudisrakennus- ja peruskorjaushanke. Rakennuskokonaisuuteen sijoittuvat Porin ruotsalaisen yhteiskoulun (Bss) ja Porin ruotsinkielisen kulttuurisäätiön (SKiB) koulu- ja kulttuurikampuksen tilat.</p>
-        <p>Säilyvien osittain suojeltujen rakennusten kunnostamisen yhteydessä toteutetaan tilamuutokset ja korjaukset. Uudisrakennus sijoittuu kahteen maanpäälliseen kerrokseen ja yhteen kellarikerrokseen.</p>
+        <p>
+          Bss + SKiB Kampus on Porin ruotsinkielisen yhtenäiskoulun (Bss) ja Svenska
+          Kulturfonden i Björneborg-säätiön uudisrakennus- ja peruskorjaushanke.
+          Rakennuskokonaisuuteen sijoittuvat Porin ruotsalaisen yhteiskoulun (Bss)
+          ja Porin ruotsinkielisen kulttuurisäätiön (SKiB) koulu- ja kulttuurikampuksen
+          tilat.
+        </p>
+        <p>
+          Säilyvien osittain suojeltujen rakennusten kunnostamisen yhteydessä
+          toteutetaan tilamuutokset ja korjaukset. Uudisrakennus sijoittuu kahteen
+          maanpäälliseen kerrokseen ja yhteen kellarikerrokseen.
+        </p>
       </section>
-
       <!-- Osa 4 -->
       <section>
         <h2>Osa 4 – Työmaa-alueen osat</h2>
@@ -322,7 +390,6 @@
           <li>RH = Rosa Huset</li>
         </ul>
       </section>
-
       <!-- Osa 5 -->
       <section>
         <h2>Osa 5 – Työmaa-info</h2>
@@ -331,12 +398,13 @@
           <li>Leimautuminen portilla tai katusiiven 1. krs aulassa.</li>
           <li>Autojen säilyttäminen työmaalla kielletty.</li>
           <li>Kameravalvonta ja hälytysjärjestelmä.</li>
-          <li>Rakennushissin käyttö koulutuksen jälkeen – pyydä koulutus.</li>
-          <li>Torninosturin nostot vain luvalla.</li>
+          <li>
+            Rakennushissin käyttö koulutuksen jälkeen – pyydä koulutus MVR-Yhtymältä.
+          </li>
+          <li>Torninosturin nostot vain với luvalla.</li>
           <li>Sosiaali- ja taukotilat katusiiven 1. kerroksessa.</li>
         </ul>
       </section>
-
       <!-- Osa 6 -->
       <section>
         <h2>Osa 6 – Pelastautuminen ja ensiapu</h2>
@@ -346,11 +414,10 @@
         <ul>
           <li>Taukotila</li>
           <li>Miesten sosiaalitila</li>
-          <li>Katusiiven sisäänkäynti (ulkona, katoksen alla)</li>
+          <li>Katusiiven sisäänkäynti (katoksen alla)</li>
           <li>Kerrostasanteet (rappukäytävä)</li>
         </ul>
       </section>
-
       <!-- Osa 7 -->
       <section>
         <h2>Osa 7 – Työturvallisuus</h2>
@@ -360,13 +427,15 @@
           <li>CE/EN397-kypärä leukahihnalla</li>
           <li>Suojalasit</li>
           <li>Turvakengät naulasuojalla</li>
-          <li>Kuulosuojaimet tarpeen mukaan</li>
+          <li>Kuulosuojaimet ja hengityssuojaimet tarpeen mukaan</li>
           <li>Valjaat aina aukkojen ja yli 2 m korkeuden yhteydessä</li>
           <li>Valjaat teleskooppinosturin korissa</li>
         </ul>
-        <p>Työturvallisuushavainto: <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a></p>
+        <p>
+          Työturvallisuushavainto:
+          <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a>
+        </p>
       </section>
-
       <!-- Osa 8 -->
       <section>
         <h2>Osa 8 – Työmaan erityispiirteet</h2>
@@ -376,24 +445,30 @@
           <li>Ahdas alue – varastointipaikat sovittava MVR-Yhtymän kanssa</li>
         </ul>
       </section>
-
       <!-- Osa 9 -->
       <section>
         <h2>Osa 9 – Puhtauden- ja jätteidenhallinta</h2>
-        <p>Uudisrakennustyömaalla P1-vaihe otetaan käyttöön runkovaiheen jälkeen. Peruskorjatuissa osissa P1-luokka purkutöistä alkaen.</p>
+        <p>
+          Uudisrakennustyömaalla P1-vaihe otetaan käyttöön runkovaiheen jälkeen.
+          Peruskorjatuissa osissa P1-luokka purkutöistä alkaen.
+        </p>
         <ul>
           <li>Jäteastiat kannellisia (ei avo-astioita)</li>
-          <li>Harjasiivous kielletty – oma työalue siivottava päivittäin</li>
-          <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli, pahvi, kipsilevy, vaaralliset jätteet</li>
+          <li>Harjasiivous kielletty – oma alue siivottava päivittäin</li>
+          <li>
+            Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli, pahvi,
+            kipsilevy, vaaralliset jätteet
+          </li>
         </ul>
       </section>
-
       <!-- Osa 10 -->
       <section>
         <h2>Osa 10 – Kosteudenhallinta</h2>
-        <p>Tavoitteena estää kosteusvauriot. Noudata pääurakoitsijan ohjeita ja hyvää rakennustapaa. Ilmoita havaitsemistasi poikkeamista viipymättä.</p>
+        <p>
+          Tavoitteena estää kosteusvauriot. Noudata pääurakoitsijan ohjeita ja
+          hyvää rakennustapaa. Ilmoita poikkeamista välittömästi työnjohdolle.
+        </p>
       </section>
-
       <!-- Osa 11 -->
       <section>
         <h2>Osa 11 – Työmaan henkilöstö</h2>
@@ -408,7 +483,6 @@
           <li>Tommi Varjo – 044 291 9292 (Työnjohtaja, katusiipi)</li>
         </ul>
       </section>
-
       <!-- Osa 12 – Allekirjoitus -->
       <section>
         <h2>Osa 12 – Hyväksyntä</h2>
@@ -421,10 +495,8 @@
         </div>
         <input type="hidden" name="signature_data" id="signature_data" required />
       </section>
-
       <button type="submit">Lähetä lomake</button>
     </form>
-
     <!-- Kamera-modal -->
     <div id="camera-modal" class="hidden">
       <video id="camera-video" autoplay playsinline></video>
@@ -435,41 +507,34 @@
       </div>
     </div>
   </main>
-
   <script>
-    /* =====================================
-       Allekirjoitusruutu ja scrollilukko
-    ===================================== */
+    // Allekirjoitusruutu ja scroll-lukko
     const body = document.body;
     let origOverflow;
-
-    const canvas = document.getElementById('signature-pad');
-    const ctx = canvas.getContext('2d');
+    const canvasSig = document.getElementById('signature-pad');
+    const ctxSig = canvasSig.getContext('2d');
     let drawing = false, lastX = 0, lastY = 0;
-
     function resizeSignature() {
       const ratio = window.devicePixelRatio || 1;
-      const w = canvas.offsetWidth;
-      const h = canvas.offsetHeight;
-      canvas.width = w * ratio;
-      canvas.height = h * ratio;
-      ctx.scale(ratio, ratio);
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 2;
-      ctx.clearRect(0, 0, w, h);
+      const w = canvasSig.offsetWidth, h = canvasSig.offsetHeight;
+      canvasSig.width = w * ratio;
+      canvasSig.height = h * ratio;
+      ctxSig.scale(ratio, ratio);
+      ctxSig.lineCap = 'round';
+      ctxSig.lineJoin = 'round';
+      ctxSig.lineWidth = 2;
+      ctxSig.clearRect(0, 0, w, h);
     }
     window.addEventListener('resize', resizeSignature);
     resizeSignature();
-
     function startSig(e) {
       e.preventDefault();
       drawing = true;
       origOverflow = body.style.overflow;
       body.style.overflow = 'hidden';
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX || e.touches[0].clientX) - rect.left;
-      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+      const rect = canvasSig.getBoundingClientRect();
+      const x = (e.clientX||e.touches[0].clientX) - rect.left;
+      const y = (e.clientY||e.touches[0].clientY) - rect.top;
       lastX = x; lastY = y;
     }
     function endSig() {
@@ -479,34 +544,31 @@
     function moveSig(e) {
       if (!drawing) return;
       e.preventDefault();
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX || e.touches[0].clientX) - rect.left;
-      const y = (e.clientY || e.touches[0].clientY) - rect.top;
-      ctx.beginPath();
-      ctx.moveTo(lastX, lastY);
-      ctx.lineTo(x, y);
-      ctx.stroke();
+      const rect = canvasSig.getBoundingClientRect();
+      const x = (e.clientX||e.touches[0].clientX) - rect.left;
+      const y = (e.clientY||e.touches[0].clientY) - rect.top;
+      ctxSig.beginPath();
+      ctxSig.moveTo(lastX, lastY);
+      ctxSig.lineTo(x, y);
+      ctxSig.stroke();
       lastX = x; lastY = y;
     }
-    ['pointerdown','touchstart'].forEach(evt => canvas.addEventListener(evt, startSig));
-    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt => canvas.addEventListener(evt, endSig));
-    ['pointermove','touchmove'].forEach(evt => canvas.addEventListener(evt, moveSig));
+    ['pointerdown','touchstart'].forEach(evt => canvasSig.addEventListener(evt, startSig));
+    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt => canvasSig.addEventListener(evt, endSig));
+    ['pointermove','touchmove'].forEach(evt => canvasSig.addEventListener(evt, moveSig));
     document.getElementById('clear-signature').addEventListener('click', resizeSignature);
-
     document.getElementById('orientationForm').addEventListener('submit', e => {
-      const rect = canvas.getBoundingClientRect();
-      const data = ctx.getImageData(0, 0, rect.width, rect.height).data;
+      const rect = canvasSig.getBoundingClientRect();
+      const data = ctxSig.getImageData(0, 0, rect.width, rect.height).data;
       if (!data.some(v => v !== 0)) {
         e.preventDefault();
         alert('Ole hyvä ja allekirjoita ennen lähettämistä.');
         return;
       }
-      document.getElementById('signature_data').value = canvas.toDataURL();
+      document.getElementById('signature_data').value = canvasSig.toDataURL();
     });
 
-    /* ================================
-       Kameratoiminnot Valttikortille
-    ================================ */
+    // Kamera & viivakoodin tunnistus
     const openBtn = document.getElementById('open-camera');
     const modal = document.getElementById('camera-modal');
     const video = document.getElementById('camera-video');
@@ -515,6 +577,7 @@
     const cardInput = document.getElementById('card_photo_data');
     const cardPreview = document.getElementById('card-photo-preview');
     let stream;
+    const codeReader = new ZXing.BrowserBarcodeReader();
 
     openBtn.addEventListener('click', async () => {
       modal.classList.remove('hidden');
@@ -529,15 +592,16 @@
       }
     });
 
-    takeBtn.addEventListener('click', () => {
-      const w = video.videoWidth;
-      const h = video.videoHeight;
+    takeBtn.addEventListener('click', async () => {
+      // Ota kuva
+      const w = video.videoWidth, h = video.videoHeight;
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = w;
       tempCanvas.height = h;
       const tempCtx = tempCanvas.getContext('2d');
       tempCtx.drawImage(video, 0, 0, w, h);
 
+      // Rajaa overlay-alueen mukaan
       const overlay = document.querySelector('.camera-overlay').getBoundingClientRect();
       const videoRect = video.getBoundingClientRect();
       const scaleX = w / videoRect.width;
@@ -546,17 +610,27 @@
       const cropY = (overlay.top - videoRect.top) * scaleY;
       const cropW = overlay.width * scaleX;
       const cropH = overlay.height * scaleY;
-
       const cropCanvas = document.createElement('canvas');
       cropCanvas.width = cropW;
       cropCanvas.height = cropH;
       const cropCtx = cropCanvas.getContext('2d');
       cropCtx.drawImage(tempCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
+      // Näytä esikatselu
       const dataURL = cropCanvas.toDataURL('image/png');
       cardInput.value = dataURL;
       cardPreview.src = dataURL;
       cardPreview.classList.remove('hidden');
+
+      // Viivakoodin tunnistus
+      try {
+        const result = await codeReader.decodeFromCanvas(cropCanvas);
+        document.getElementById('valtti').value = result.text;
+      } catch (err) {
+        console.warn('Viivakoodia ei tunnistettu:', err);
+      }
+
+      // Sulje modal ja pysäytä kamera
       modal.classList.add('hidden');
       stream.getTracks().forEach(t => t.stop());
     });
