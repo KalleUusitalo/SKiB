@@ -66,7 +66,8 @@
       padding: 0.5em;
       border: 1px solid #ccc;
       border-radius: var(--radius);
-      width: 100%; max-width: 100%;
+      width: 100%;
+      max-width: 100%;
     }
     input:invalid, select:invalid { border-color: red; }
     button {
@@ -92,7 +93,22 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
   <script>
+    // Initialize EmailJS
     (function() { emailjs.init('GrJbR0Z9xXufM9WoR'); })();
+
+    // Helper: compress canvas to JPEG Data URL
+    function canvasToJpegDataURL(srcCanvas, maxWidth=600, quality=0.7) {
+      const w = srcCanvas.width;
+      const h = srcCanvas.height;
+      const scale = Math.min(1, maxWidth/w);
+      const cw = w*scale;
+      const ch = h*scale;
+      const tmp = document.createElement('canvas');
+      tmp.width = cw;
+      tmp.height = ch;
+      tmp.getContext('2d').drawImage(srcCanvas, 0,0, w,h, 0,0,cw,ch);
+      return tmp.toDataURL('image/jpeg', quality);
+    }
   </script>
 </head>
 <body>
@@ -176,7 +192,7 @@
             </select>
           </div>
           <div class="form-group hidden" id="kouluyhteyshenkilo_group">
-            <label for="kouluyhteyshenkilo">11. Koulun yhteyshenkilö (harjoittelija)</label>
+            <label for="kouluyhteyshenkilo">11. Jos olet harjoittelija, koulun yhteyshenkilö</label>
             <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero" />
           </div>
           <div class="form-group">
@@ -194,101 +210,95 @@
         </div>
       </section>
 
-      <!-- Osa 2 -->
+      <!-- Osa 2 – Perehdytyksen tavoitteet -->
       <section>
         <h2>Osa 2 – Perehdytyksen tavoitteet</h2>
-        <p>Perehdytyksen tavoitteena on varmistaa työntekijän turvallisuus ja tehokkuus työmaalla:</p>
         <ul>
           <li>Työturvallisuuden merkitys ja vastuunkanto</li>
-          <li>Työmaan säännöt ja pelisäännöt</li>
-          <li>Käytännön työvaiheet ja riskikohdat</li>
-          <li>Henkilösuojaimet ja suojavälineet</li>
+          <li>Työmaan pelisäännöt ja riskien tunnistus</li>
+          <li>Henkilösuojaimien käyttö
           <li>Pelastus- ja ensiapumenettelyt</li>
         </ul>
       </section>
 
-      <!-- Osa 3 -->
+      <!-- Osa 3 – Perehdytysvastuut -->
       <section>
         <h2>Osa 3 – Perehdytysvastuut</h2>
         <ul>
-          <li><strong>Pääurakoitsija:</strong> Vastaa kokonaisuudesta ja valvonnasta</li>
-          <li><strong>Työnjohtaja:</strong> Varmistaa aliurakoitsijoiden perehdytyksen</li>
-          <li><strong>Perehdyttäjä:</strong> Suorittaa kohde-esittelyn työntekijälle</li>
-          <li><strong>Työntekijä:</strong> Osallistuu ja ilmoittaa havaitsemistaan riskeistä</li>
+          <li><strong>Pääurakoitsija:</strong> Valvoo perehdytyksen kvalitettiin</li>
+          <li><strong>Työnjohtaja:</strong> Vastaa aliurakoitsijoiden perehdytyksestä</li>
+          <li><strong>Perehdyttäjä:</strong> Esittelee kohteen turvallisuusnäkökohdat</li>
+          <li><strong>Työntekijä:</strong> Osallistuu aktiivisesti ja esittää kysymyksiä</li>
         </ul>
       </section>
 
-      <!-- Osa 4 -->
+      <!-- Osa 4 – Perehdytyksen sisältö -->
       <section>
         <h2>Osa 4 – Perehdytyksen sisältö</h2>
         <ul>
-          <li>Työmaan tilat ja kulkureitit</li>
-          <li>Varastointi ja logistiset reitit</li>
-          <li><strong>Jätteiden- ja puhtaudenhallinta:</strong> P1-vaihe</li>
+          <li>Työmaan tilat, kulkureitit ja varastointipaikat</li>
+          <li>Jätteiden- ja puhtaudenhallinta (P1-vaihe)</li>
           <li>Kosteudenhallinta ja ympäristönäkökohdat</li>
-          <li>Tulityöt ja paloturvallisuus</li>
-          <li>Sähkötyöt ja nostotyöt</li>
+          <li>Tulityöt, paloturvallisuus ja sähköturvallisuus</li>
+          <li>Nostotyöt ja työturvallisuusohjeet</li>
         </ul>
       </section>
 
-      <!-- Osa 5 -->
+      <!-- Osa 5 – Työmaakierrokset ja riskikartoitus -->
       <section>
         <h2>Osa 5 – Työmaakierros ja riskikartoitus</h2>
         <ul>
           <li>Kulkureitit ja poistumistiet</li>
-          <li>Tontin rajat ja aitaus</li>
-          <li>Nosturityöt ja nostokalusto</li>
-          <li>Erityisalueiden riskit (kosteus, pöly, melu)</li>
+          <li>Nosturi- ja nostokaluston riskit</li>
+          <li>Sähkö- ja automaatiotilojen vaarat</li>
+          <li>Erityisalueiden (kosteus, pöly, melu) riskit</li>
         </ul>
       </section>
 
-      <!-- Osa 6 -->
+      <!-- Osa 6 – Pelastus ja ensiapu -->
       <section>
         <h2>Osa 6 – Pelastus ja ensiapu</h2>
         <p><strong>Hätänumero:</strong> 112</p>
         <p><strong>Kokoontumispaikka:</strong> Liisantori</p>
         <ul>
           <li>Taukotila</li>
-          <li>Miesten sosiaalitila</li>
-          <li>Katusiiven sisäänkäynti (katoksen alla)</li>
+          <li>Katusiiven sosiaalitila ja sisäänkäynti</li>
           <li>Kerrostasanteet (rappukäytävä)</li>
         </ul>
       </section>
 
-      <!-- Osa 7 -->
+      <!-- Osa 7 – Henkilösuojaimet -->
       <section>
         <h2>Osa 7 – Henkilösuojaimet</h2>
         <ul>
           <li>CE/EN397-kypärä leukahihnalla</li>
-          <li>Suojalasit</li>
           <li>Turvakengät naulasuojilla</li>
-          <li>Kuulosuojaimet</li>
-          <li>Hengityssuojaimet</li>
+          <li>Suojalasit, kuulonsuojaimet ja hengityssuojaimet</li>
         </ul>
       </section>
 
-      <!-- Osa 8 -->
+      <!-- Osa 8 – Jätteiden hallinta -->
       <section>
         <h2>Osa 8 – Jätteiden hallinta</h2>
         <ul>
-          <li>P1-vaiheen puhtausvaatimukset</li>
-          <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli, pahvi, kipsilevy, vaaralliset</li>
+          <li>P1-puhtausvaatimukset runko- ja peruskorjausvaiheessa</li>
+          <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli, pahvi, kipsilevy
         </ul>
       </section>
 
-      <!-- Osa 9 -->
+      <!-- Osa 9 – Kosteudenhallinta -->
       <section>
         <h2>Osa 9 – Kosteudenhallinta</h2>
-        <p>Tavoite: estää kosteusvauriot. Noudata suunnitelmia ja raportoi poikkeamat.</p>
+        <p>Tavoitteena estää kosteusvauriot. Noudata suunnitelmia ja ilmoita poikkeamat.</p>
       </section>
 
-      <!-- Osa 10 -->
+      <!-- Osa 10 – Työturvallisuushavainnot -->
       <section>
         <h2>Osa 10 – Työturvallisuushavainnot</h2>
-        <p>Ilmoita havainnoista <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a>.</p>
+        <p>Raportoi havainnoista: <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a></p>
       </section>
 
-      <!-- Osa 11 -->
+      <!-- Osa 11 – Työmaan henkilöstö ja organisaatio -->
       <section>
         <h2>Osa 11 – Henkilöstö ja organisaatio</h2>
         <ul>
@@ -303,7 +313,7 @@
         </ul>
       </section>
 
-      <!-- Osa 12 -->
+      <!-- Osa 12 – Allekirjoitus -->
       <section>
         <h2>Osa 12 – Allekirjoitus</h2>
         <div class="form-group">
@@ -319,7 +329,7 @@
       <button type="submit">Lähetä lomake</button>
     </form>
 
-    <!-- Camera Modal -->
+    <!-- Kamera-modali -->
     <div id="camera-modal" class="hidden">
       <video id="camera-video" autoplay playsinline></video>
       <div class="camera-overlay"></div>
@@ -331,25 +341,24 @@
   </main>
 
   <script>
-    // Signature pad + scroll lock
+    // Canvas signature + scroll lock
     const body = document.body;
-    let origOverflow;
     const canvasSig = document.getElementById('signature-pad');
     const ctxSig = canvasSig.getContext('2d');
-    let drawing = false, lastX = 0, lastY = 0;
-    function resizeSignature() {
-      const ratio = window.devicePixelRatio || 1;
+    let drawing = false, lastX = 0, lastY = 0, origOverflow;
+    function resizeSig() {
+      const r = window.devicePixelRatio || 1;
       const w = canvasSig.offsetWidth, h = canvasSig.offsetHeight;
-      canvasSig.width = w * ratio;
-      canvasSig.height = h * ratio;
-      ctxSig.scale(ratio, ratio);
+      canvasSig.width = w * r;
+      canvasSig.height = h * r;
+      ctxSig.scale(r, r);
       ctxSig.lineCap = 'round';
       ctxSig.lineJoin = 'round';
       ctxSig.lineWidth = 2;
       ctxSig.clearRect(0, 0, w, h);
     }
-    window.addEventListener('resize', resizeSignature);
-    resizeSignature();
+    window.addEventListener('resize', resizeSig);
+    resizeSig();
     function startSig(e) {
       e.preventDefault(); drawing = true;
       origOverflow = body.style.overflow;
@@ -365,15 +374,18 @@
       const rect = canvasSig.getBoundingClientRect();
       const x = (e.clientX||e.touches[0].clientX) - rect.left;
       const y = (e.clientY||e.touches[0].clientY) - rect.top;
-      ctxSig.beginPath(); ctxSig.moveTo(lastX, lastY); ctxSig.lineTo(x, y); ctxSig.stroke();
+      ctxSig.beginPath();
+      ctxSig.moveTo(lastX, lastY);
+      ctxSig.lineTo(x, y);
+      ctxSig.stroke();
       lastX = x; lastY = y;
     }
-    ['pointerdown','touchstart'].forEach(evt=>canvasSig.addEventListener(evt,startSig));
-    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt=>canvasSig.addEventListener(evt,endSig));
-    ['pointermove','touchmove'].forEach(evt=>canvasSig.addEventListener(evt,moveSig));
-    document.getElementById('clear-signature').addEventListener('click',resizeSignature);
+    ['pointerdown','touchstart'].forEach(evt=>canvasSig.addEventListener(evt, startSig));
+    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt=>canvasSig.addEventListener(evt, endSig));
+    ['pointermove','touchmove'].forEach(evt=>canvasSig.addEventListener(evt, moveSig));
+    document.getElementById('clear-signature').addEventListener('click', resizeSig);
 
-    // Camera modal
+    // Kamera-modali
     const openCam = document.getElementById('open-camera');
     const camModal = document.getElementById('camera-modal');
     const video = document.getElementById('camera-video');
@@ -382,33 +394,62 @@
     const cardInput = document.getElementById('card_photo_data');
     const cardPreview = document.getElementById('card-photo-preview');
     let camStream;
-    openCam.addEventListener('click',async()=>{
+    openCam.addEventListener('click', async () => {
       camModal.classList.remove('hidden');
       try {
-        camStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:'environment',width:{ideal:4096},height:{ideal:2160}} });
+        camStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 2160 } }
+        });
         video.srcObject = camStream;
-      } catch(err) { alert('Kameran käyttö ei onnistu: '+err.message); camModal.classList.add('hidden'); }
+      } catch (err) {
+        alert('Kameran käyttö ei onnistu: ' + err.message);
+        camModal.classList.add('hidden');
+      }
     });
-    takeBtn.addEventListener('click',()=>{
-      const w=video.videoWidth,h=video.videoHeight,tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(video,0,0,w,h);
-      const rect=document.querySelector('.camera-overlay').getBoundingClientRect(),vidRect=video.getBoundingClientRect();
-      const scaleX=w/vidRect.width,scaleY=h/vidRect.height,x=(rect.left-vidRect.left)*scaleX,y=(rect.top-vidRect.top)*scaleY,cw=rect.width*scaleX,ch=rect.height*scaleY;
-      const crop=document.createElement('canvas');crop.width=cw;crop.height=ch;crop.getContext('2d').drawImage(tmp,x,y,cw,ch,0,0,cw,ch);
-      const url=crop.toDataURL('image/png');cardInput.value=url;cardPreview.src=url;cardPreview.classList.remove('hidden');camModal.classList.add('hidden');camStream.getTracks().forEach(t=>t.stop());
+    takeBtn.addEventListener('click', () => {
+      const w = video.videoWidth, h = video.videoHeight;
+      const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h;
+      tmp.getContext('2d').drawImage(video, 0,0, w,h);
+      const rect = document.querySelector('.camera-overlay').getBoundingClientRect();
+      const vidRect = video.getBoundingClientRect();
+      const scaleX = w/vidRect.width, scaleY = h/vidRect.height;
+      const x = (rect.left - vidRect.left)*scaleX;
+      const y = (rect.top - vidRect.top)*scaleY;
+      const cw = rect.width*scaleX, ch = rect.height*scaleY;
+      const crop = document.createElement('canvas'); crop.width = cw; crop.height = ch;
+      crop.getContext('2d').drawImage(tmp, x,y,cw,ch, 0,0,cw,ch);
+      const jpeg = canvasToJpegDataURL(crop, 600, 0.7);
+      cardInput.value = jpeg;
+      cardPreview.src = jpeg;
+      cardPreview.classList.remove('hidden');
+      camModal.classList.add('hidden');
+      camStream.getTracks().forEach(t=>t.stop());
     });
-    closeCam.addEventListener('click',()=>{ camModal.classList.add('hidden'); if(camStream) camStream.getTracks().forEach(t=>t.stop()); });
+    closeCam.addEventListener('click', () => {
+      camModal.classList.add('hidden');
+      if (camStream) camStream.getTracks().forEach(t=>t.stop());
+    });
 
-    // Show trainee contact
-    document.getElementById('rooli').addEventListener('change',e=>{
-      const grp=document.getElementById('kouluyhteyshenkilo_group');
-      if(e.target.value==='Harjoittelija'){ grp.classList.remove('hidden'); grp.querySelector('input').required=true;} else{ grp.classList.add('hidden'); grp.querySelector('input').required=false; }
+    // Näytä kouluyhteyshenk.
+    document.getElementById('rooli').addEventListener('change', e => {
+      const grp = document.getElementById('kouluyhteyshenkilo_group');
+      if (e.target.value === 'Harjoittelija') {
+        grp.classList.remove('hidden');
+        grp.querySelector('input').required = true;
+      } else {
+        grp.classList.add('hidden');
+        grp.querySelector('input').required = false;
+      }
     });
 
-    // EmailJS submission
-    document.getElementById('orientationForm').addEventListener('submit', function(e){
+    // EmailJS-lähetys
+    document.getElementById('orientationForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      emailjs.sendForm('service_bvdu9lj','template_hlooz52', this)
-        .then(() => alert('Lomake lähetetty!'),
+      // Pakkaa allekirjoitus JPEG:ksi
+      document.getElementById('signature_data').value =
+        canvasToJpegDataURL(canvasSig, 600, 0.7);
+      emailjs.sendForm('service_bvdu9lj', 'template_hlooz52', this)
+        .then(() => alert('Lomake lähetetty onnistuneesti!'),
               err => alert('Lähetys epäonnistui: ' + JSON.stringify(err))
         );
     });
