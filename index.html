@@ -1,53 +1,694 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Valttikortin lomake</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
-  <!-- Pääsovelluslogiikka -->
-  <script type="module" src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVR-Yhtymä Oy – Perehdytyslomake</title>
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-hover: #0056b3;
+      --bg-light: #f5f5f5;
+      --bg-white: #fff;
+      --text-dark: #333;
+      --radius: 8px;
+      --spacing: 16px;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--bg-white);
+      padding: var(--spacing);
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    main {
+      max-width: 900px;
+      margin: var(--spacing) auto;
+      padding: 0 var(--spacing);
+    }
+    section {
+      background: var(--bg-white);
+      margin-bottom: var(--spacing);
+      padding: var(--spacing);
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.25em;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing);
+    }
+    @media (min-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+    input, select, textarea, button, canvas {
+      font-size: 1rem;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 100%;
+    }
+    input:invalid, select:invalid {
+      border-color: red;
+    }
+    button {
+      margin-top: var(--spacing);
+      background: var(--primary-color);
+      color: var(--bg-white);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--primary-hover);
+    }
+    .hidden {
+      display: none;
+    }
+    ul {
+      padding-left: 1em;
+      margin: 0;
+    }
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Signature canvas */
+    canvas.signature {
+      border: 1px solid #ccc;
+      cursor: crosshair;
+      height: 200px;
+      width: 100%;
+    }
+
+    /* Camera modal */
+    #camera-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #camera-modal.hidden {
+      display: none;
+    }
+    #camera-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .camera-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 190px;
+      margin-left: -150px;
+      margin-top: -95px;
+      box-shadow: 0 0 0 2000px rgba(255,255,255,0.8);
+      border: 2px dashed var(--primary-color);
+      border-radius: 8px;
+    }
+    .camera-controls {
+      position: absolute;
+      bottom: var(--spacing);
+      display: flex;
+      gap: var(--spacing);
+    }
+  </style>
 </head>
 <body>
-  <header class="site-header">
-    <h1>Valttikortin lomake</h1>
+  <header>
+    <h1>MVR-Yhtymä Oy</h1>
+    <p>Perehdytyslomake – Bss + SKiB Kampus työmaa</p>
   </header>
+  <main>
+    <form id="orientationForm">
+      <!-- Osa 1 -->
+      <section>
+        <h2>Osa 1 – Perehdytys</h2>
+        <div class="form-group">
+          <label>FOREIGN PERSONS</label>
+          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank">
+            Suorita perehdytys tästä
+          </a>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="valtti">1. VALTTI-kortin numero (12 numeroa)</label>
+            <input
+              id="valtti"
+              name="valtti"
+              type="text"
+              inputmode="numeric"
+              pattern="\d{12}"
+              required
+              placeholder="123456789012"
+            />
+          </div>
+          <div class="form-group">
+            <label for="veronumero">2. Veronumero (12 numeroa, jos ei Valttia)</label>
+            <input
+              id="veronumero"
+              name="veronumero"
+              type="text"
+              inputmode="numeric"
+              pattern="\d{12}"
+              placeholder="100012345678"
+            />
+          </div>
+          <div class="form-group">
+            <label for="yritys">3. Yritys (palkan maksava yritys)</label>
+            <input id="yritys" name="yritys" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="tilaaja">4. Tilaaja</label>
+            <select id="tilaaja" name="tilaaja" required>
+              <option value="">-- Valitse --</option>
+              <option>Svenska Kulturfonden i Björneborg -säätiö</option>
+              <option>MVR-Yhtymä Oy</option>
+              <option>Ilmastointi Salminen Oy</option>
+              <option>Mekeltek Oy</option>
+              <option>Prepon Oy</option>
+              <option>Vehmasputki Oy</option>
+              <option>Timantti-Nieminen Oy</option>
+              <option>Paloff Sammutusjärjestelmät Oy</option>
+              <option>Trentec Oy</option>
+              <option>En tiedä</option>
+              <option value="muu">Muu</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="syntymaan">5. Syntymäaika</label>
+            <input id="syntymaan" name="syntymaan" type="date" required />
+          </div>
+          <div class="form-group">
+            <label for="sukunimi">6. Sukunimi</label>
+            <input id="sukunimi" name="sukunimi" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="etunimi">7. Etunimi</label>
+            <input id="etunimi" name="etunimi" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="puhelin">8. Puhelinnumero</label>
+            <input
+              id="puhelin"
+              name="puhelin"
+              type="tel"
+              required
+              placeholder="+358 44 123 1234"
+            />
+          </div>
+          <div class="form-group">
+            <label for="sahkoposti">9. Sähköposti</label>
+            <input id="sahkoposti" name="sahkoposti" type="email" required />
+          </div>
+          <div class="form-group">
+            <label for="rooli">10. Rooli</label>
+            <select id="rooli" name="rooli" required>
+              <option value="">-- Valitse --</option>
+              <option>Työntekijä</option>
+              <option>Työnjohtaja</option>
+              <option>Vierailija</option>
+              <option>Harjoittelija</option>
+              <option>Muu</option>
+            </select>
+          </div>
+          <div class="form-group hidden" id="kouluyhteyshenkilo_group">
+            <label for="kouluyhteyshenkilo">
+              11. Jos olet harjoittelija, koulun yhteyshenkilö
+            </label>
+            <input
+              id="kouluyhteyshenkilo"
+              name="kouluyhteyshenkilo"
+              type="text"
+              placeholder="Nimi ja puhelinnumero"
+            />
+          </div>
+          <div class="form-group">
+            <label for="kansalaisuus">12. Kansalaisuus</label>
+            <select id="kansalaisuus" name="kansalaisuus" required>
+              <option value="">-- Valitse --</option>
+              <option value="foreign">
+                FOREIGN PERSONS: Complete orientation from the link
+              </option>
+              <option value="suomi">Suomi</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pvaltion">13. Pääasiallinen työskentelyvaltio</label>
+            <input id="pvaltion" name="pvaltion" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="kieli">14. Kieli</label>
+            <input id="kieli" name="kieli" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="ttkortti_voi">
+              15. Työturvallisuuskortti voimassa (kk/vvvv)
+            </label>
+            <input
+              id="ttkortti_voi"
+              name="ttkortti_voi"
+              type="text"
+              required
+              placeholder="08/2025"
+            />
+          </div>
+          <div class="form-group">
+            <label for="ttkortti_num">16. Työturvallisuuskortin numero</label>
+            <input
+              id="ttkortti_num"
+              name="ttkortti_num"
+              type="text"
+              inputmode="numeric"
+              pattern="\d+"
+/>
+          </div>
+          <div class="form-group">
+            <label for="tko_voi">
+              17. Tulityökortti voimassa (kk/vuosi) (tarvittaessa)
+            </label>
+            <input
+              id="tko_voi"
+              name="tko_voi"
+              type="text"
+              placeholder="mm/vuosi"
+/>
+          </div>
+          <div class="form-group">
+            <label for="tko_num">18. Tulityökortin numero</label>
+            <input
+              id="tko_num"
+              name="tko_num"
+              type="text"
+              inputmode="numeric"
+              pattern="\d+"
+/>
+          </div>
+          <div class="form-group">
+            <label>19. Työturvallisuusorganisaatio</label>
+            <select id="tto" name="tto" required>
+              <option value="">-- Valitse --</option>
+              <option>OK</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <button type="button" id="open-camera">Ota kuva kortista</button>
+            <input type="hidden" name="card_photo_data" id="card_photo_data" />
+            <img
+              id="card-photo-preview"
+              class="hidden"
+              alt="Korttikuvan esikatselu"
+/>
+          </div>
+        </div>
+      </section>
 
-  <form id="card-form">
-    <!-- Etunimi -->
-    <div class="form-group">
-      <label for="firstName">Etunimi</label>
-      <input type="text" id="firstName" name="firstName" required>
-    </div>
-    <!-- Sukunimi -->
-    <div class="form-group">
-      <label for="lastName">Sukunimi</label>
-      <input type="text" id="lastName" name="lastName" required>
-    </div>
-    <!-- Korttikuvan otto -->
-    <div class="form-group">
-      <label>Lisää kuva valttikortista</label>
-      <div class="camera-frame" id="cameraFrame"></div>
-      <div class="controls">
-        <button type="button" id="openCamera">Avaa kamera</button>
-        <button type="button" id="capture" disabled>Ota kuva</button>
-      </div>
-      <div class="preview" id="preview"></div>
-      <input type="hidden" name="cardImage" id="cardImageInput">
-    </div>
-    <!-- Lähetys -->
-    <div class="controls">
+      <!-- Osa 2 -->
+      <section>
+        <h2>Osa 2 – Kohteen yleisesittely</h2>
+        <p><strong>Hankkeen nimi:</strong> Bss + SKiB Kampus</p>
+        <p><strong>Työmaan osoite:</strong> Otavankatu 16, 28100 Pori</p>
+        <p><strong>Työmaan käyntiosoite:</strong> Mikonkatu 15-17, 28100 Pori</p>
+        <p><strong>Rakentamisaikataulu:</strong> 08/2023 – 12/2025</p>
+        <p><strong>Tilaaja:</strong> Svenska Kulturfonden i Björneborg</p>
+        <p><strong>Pääurakoitsija:</strong> MVR-Yhtymä Oy</p>
+        <p><strong>Sivu-urakoitsijat:</strong></p>
+        <ul>
+          <li>Purku-urakoitsija: Timantti-Nieminen Oy</li>
+          <li>Putkiurakoitsija: Vehmasputki Oy</li>
+          <li>SPR-urakoitsija: Paloff Sammutusjärjestelmät Oy</li>
+          <li>IV-urakoitsija: Ilmastointi Salminen Oy</li>
+          <li>AU Rakennusautomaatio: Trentec Oy</li>
+          <li>Sähköurakoitsija: Mekeltek Oy</li>
+        </ul>
+      </section>
+
+      <!-- Osa 3 -->
+      <section>
+        <h2>Osa 3 – Tietoa kohteesta</h2>
+        <p>
+          Bss + SKiB Kampus on Porin ruotsinkielisen yhtenäiskoulun (Bss) ja
+          Svenska Kulturfonden i Björneborg-säätiön uudisrakennus- ja
+          peruskorjaushanke. Rakennuskokonaisuuteen sijoittuvat Porin
+          ruotsalaisen yhteiskoulun (Bss) ja Porin ruotsinkielisen kulttuurisäätiön
+          (SKiB) koulu- ja kulttuurikampuksen tilat.
+        </p>
+        <p>
+          Säilyvien osittain suojeltujen rakennusten kunnostamisen yhteydessä
+          toteutetaan tilamuutokset ja korjaukset. Uudisrakennus sijoittuu
+          kahteen maanpäälliseen kerrokseen ja yhteen kellarikerrokseen.
+        </p>
+      </section>
+
+      <!-- Osa 4 -->
+      <section>
+        <h2>Osa 4 – Työmaa-alueen osat</h2>
+        <ul>
+          <li>UR = Uudisrakennus</li>
+          <li>PS = Pihasiipi</li>
+          <li>KS = Katusiipi</li>
+          <li>RH = Rosa Huset</li>
+        </ul>
+      </section>
+
+      <!-- Osa 5 -->
+      <section>
+        <h2>Osa 5 – Työmaa-info</h2>
+        <ul>
+          <li>
+            Työmaalle saavutaan Mikonkadun ja Otavankadun pyöröportista.
+          </li>
+          <li>
+            Leimautuminen portilla tai katusiiven 1. krs aulassa.
+          </li>
+          <li>Autojen säilyttäminen työmaalla kielletty.</li>
+          <li>Kameravalvonta ja hälytysjärjestelmä.</li>
+          <li>
+            Rakennushissin käyttö koulutuksen jälkeen – pyydä käyttökoulutus.
+          </li>
+          <li>Torninosturin nostot vain luvalla.</li>
+          <li>Sosiaali- ja taukotilat katusiiven 1. kerroksessa.</li>
+        </ul>
+      </section>
+
+      <!-- Osa 6 -->
+      <section>
+        <h2>Osa 6 – Pelastautuminen ja ensiapu</h2>
+        <p><strong>Hätänumero:</strong> 112</p>
+        <p><strong>Kokoontumispaikka:</strong> Liisantori</p>
+        <p><strong>Ensiapupisteet:</strong></p>
+        <ul>
+          <li>Taukotila</li>
+          <li>Miesten sosiaalitila</li>
+          <li>
+            Katusiiven sisäänkäynti (ulkona, katoksen alla)
+          </li>
+          <li>Kerrostasanteet (rappukäytävä)</li>
+        </ul>
+      </section>
+
+      <!-- Osa 7 -->
+      <section>
+        <h2>Osa 7 – Työturvallisuus</h2>
+        <ul>
+          <li>Neonvärinen, heijastava yläosa</li>
+          <li>Kuvallinen henkilötunnistus näkyvillä</li>
+          <li>CE/EN397-kypärä leukahihnalla</li>
+          <li>Suojalasit</li>
+          <li>Turvakengät naula­suojalla</li>
+          <li>Kuulosuojaimet tarpeen mukaan</li>
+          <li>
+            Valjaat aina aukkojen ja yli 2 m korkeuden yhteydessä
+          </li>
+          <li>
+            Valjaat teleskooppinosturin korissa
+          </li>
+        </ul>
+        <p>
+          Työturvallisuushavainto: 
+          <a href="http://teehavainto.fi/" target="_blank">
+            teehavainto.fi
+          </a>
+        </p>
+      </section>
+
+      <!-- Osa 8 -->
+      <section>
+        <h2>Osa 8 – Työmaan erityispiirteet</h2>
+        <ul>
+          <li>Ympäröivä kaupunkialue – huomioi asukkaat ja liiketilat</li>
+          <li>
+            Koulun ja päiväkodin saattoliikenne, oppilaat ja opettajat
+          </li>
+          <li>
+            Ahdas alue – varastointipaikat sovittava MVR-Yhtymän kanssa
+          </li>
+        </ul>
+      </section>
+
+      <!-- Osa 9 -->
+      <section>
+        <h2>Osa 9 – Puhtauden- ja jätteidenhallinta</h2>
+        <p>
+          Uudisrakennustyömaalla P1-vaihe otetaan käyttöön runkovaiheen jälkeen.
+          Peruskorjatuissa osissa P1-luokka purkutöistä alkaen.
+        </p>
+        <ul>
+          <li>Jäteastiat kannellisia (ei avo-astioita)</li>
+          <li>
+            Harjasiivous kielletty – oma työalue siivottava päivittäin
+          </li>
+          <li>
+            Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli,
+            pahvi, kipsilevy, vaaralliset jätteet
+          </li>
+        </ul>
+      </section>
+
+      <!-- Osa 10 -->
+      <section>
+        <h2>Osa 10 – Kosteudenhallinta</h2>
+        <p>
+          Tavoitteena estää kosteusvauriot. Noudata pääurakoitsijan
+          ohjeita ja hyvää rakennustapaa. Ilmoita havaitsemistasi
+          poikkeamista viipymättä.
+        </p>
+      </section>
+
+      <!-- Osa 11 -->
+      <section>
+        <h2>Osa 11 – Työmaan henkilöstö</h2>
+        <ul>
+          <li>
+            Veli-Matti Järvenpää – 050 521 8333 
+            (Vastaava työnjohtaja, MVR-Yhtymä Oy)
+          </li>
+          <li>
+            Mika Kangasniemi – 050 305 1492 
+            (Työsuojelupäällikkö, MVR-Yhtymä Oy)
+          </li>
+          <li>
+            Joonas Kekki – 050 436 9411 
+            (Työsuojelukoordinaattori, Prepon Oy)
+          </li>
+          <li>
+            Antti Puhakka – 050 592 6259 
+            (Työsuojeluvaltuutettu, MVR-Yhtymä Oy)
+          </li>
+          <li>
+            Kalle Uusitalo – 044 401 3286 
+            (Työmaainsinööri, MVR-Yhtymä Oy)
+          </li>
+          <li>
+            Teemu Riita – 040 072 2022 
+            (Työnjohtaja, uudisrakennus ja pihasiipi)
+          </li>
+          <li>
+            Ville Mattila – 043 826 6944 
+            (Työnjohtaja, uudisrakennus ja pihasiipi)
+          </li>
+          <li>
+            Tommi Varjo – 044 291 9292 
+            (Työnjohtaja, katusiipi)
+          </li>
+        </ul>
+      </section>
+
+      <!-- Osa 12 – Allekirjoitus -->
+      <section>
+        <h2>Osa 12 – Hyväksyntä</h2>
+        <div class="form-group">
+          <label for="signature-pad">22. Allekirjoitus</label>
+          <canvas id="signature-pad" class="signature"></canvas>
+        </div>
+        <div class="btn-group">
+          <button type="button" id="clear-signature">
+            Tyhjennä allekirjoitus
+          </button>
+        </div>
+        <input
+          type="hidden"
+          name="signature_data"
+          id="signature_data"
+          required
+        />
+      </section>
+
       <button type="submit">Lähetä lomake</button>
+    </form>
+
+    <!-- Kamera-modal -->
+    <div id="camera-modal" class="hidden">
+      <video id="camera-video" autoplay playsinline></video>
+      <div class="camera-overlay"></div>
+      <div class="camera-controls">
+        <button type="button" id="take-photo">Ota kuva</button>
+        <button type="button" id="close-camera">Peruuta</button>
+      </div>
     </div>
-  </form>
+  </main>
 
   <script>
-    // Alusta EmailJS julkisella avaimella
-    (function(){
-      emailjs.init("GrJbR0Z9xXufM9WoR");
-    })();
+    /* =====================================
+       Allekirjoitusruutu ja scrollilukko
+    ===================================== */
+    const body = document.body;
+    let origOverflow;
+
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    let drawing = false, lastX = 0, lastY = 0;
+
+    function resizeSignature() {
+      const ratio = window.devicePixelRatio || 1;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      canvas.width = w * ratio;
+      canvas.height = h * ratio;
+      ctx.scale(ratio, ratio);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 2;
+      ctx.clearRect(0, 0, w, h);
+    }
+    window.addEventListener('resize', resizeSignature);
+    resizeSignature();
+
+    function startSig(e) {
+      e.preventDefault();
+      drawing = true;
+      origOverflow = body.style.overflow;
+      body.style.overflow = 'hidden';
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+      lastX = x; lastY = y;
+    }
+    function endSig() {
+      drawing = false;
+      body.style.overflow = origOverflow;
+    }
+    function moveSig(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      lastX = x; lastY = y;
+    }
+    ['pointerdown','touchstart'].forEach(evt => canvas.addEventListener(evt, startSig));
+    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt => canvas.addEventListener(evt, endSig));
+    ['pointermove','touchmove'].forEach(evt => canvas.addEventListener(evt, moveSig));
+    document.getElementById('clear-signature').addEventListener('click', resizeSignature);
+
+    document.getElementById('orientationForm').addEventListener('submit', e => {
+      const rect = canvas.getBoundingClientRect();
+      const data = ctx.getImageData(0, 0, rect.width, rect.height).data;
+      if (!data.some(v => v !== 0)) {
+        e.preventDefault();
+        alert('Ole hyvä ja allekirjoita ennen lähettämistä.');
+        return;
+      }
+      document.getElementById('signature_data').value = canvas.toDataURL();
+    });
+
+    /* ================================
+       Kameratoiminnot Valttikortille
+    ================================ */
+    const openBtn = document.getElementById('open-camera');
+    const modal = document.getElementById('camera-modal');
+    const video = document.getElementById('camera-video');
+    const takeBtn = document.getElementById('take-photo');
+    const closeBtn = document.getElementById('close-camera');
+    const cardInput = document.getElementById('card_photo_data');
+    const cardPreview = document.getElementById('card-photo-preview');
+    let stream;
+
+    openBtn.addEventListener('click', async () => {
+      modal.classList.remove('hidden');
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Kameran käyttö ei onnistu: ' + err.message);
+        modal.classList.add('hidden');
+      }
+    });
+
+    takeBtn.addEventListener('click', () => {
+      const w = video.videoWidth;
+      const h = video.videoHeight;
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const cx = c.getContext('2d');
+      cx.drawImage(video, 0, 0, w, h);
+      const dataURL = c.toDataURL('image/png');
+      cardInput.value = dataURL;
+      cardPreview.src = dataURL;
+      cardPreview.classList.remove('hidden');
+      modal.classList.add('hidden');
+      stream.getTracks().forEach(t => t.stop());
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+      if (stream) stream.getTracks().forEach(t => t.stop());
+    });
   </script>
 </body>
 </html>
