@@ -1,5 +1,4 @@
 export const firebaseConfig = {
-const firebaseConfig = {
   apiKey: "AIzaSyD3N1jRcAwSBVzEhMLfyXG37StORE4Qr4U",
   authDomain: "skib-d8f58.firebaseapp.com",
   databaseURL: "https://skib-d8f58-default-rtdb.europe-west1.firebasedatabase.app",
