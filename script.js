@@ -1,4 +1,4 @@
-// Kameran ja lomakkeen käsittely + EmailJS
+// Päälogiikka: kamera & EmailJS
 
 document.addEventListener('DOMContentLoaded', () => {
   const openCameraBtn = document.getElementById('openCamera');
@@ -30,13 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Ota kuva kortin aukosta
+  // Ota kuva rajatusta aukosta
   captureBtn.addEventListener('click', () => {
     const frameW = cameraFrame.clientWidth;
     const frameH = cameraFrame.clientHeight;
-    const innerRatio = 0.8;
-    const cropW = frameW * innerRatio;
-    const cropH = cropW / 1.586;
+    const ratio  = 0.8;
+    const cropW  = frameW * ratio;
+    const cropH  = cropW / 1.586;
     const offsetX = (frameW - cropW) / 2;
     const offsetY = (frameH - cropH) / 2;
 
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     preview.innerHTML = `<img src="${dataUrl}">`;
     cardInput.value = dataUrl;
 
-    // Sammuta kamera ja päivitykset
+    // Sammuta kamera
     stream.getTracks().forEach(t => t.stop());
     captureBtn.disabled = true;
     openCameraBtn.textContent = 'Ota uusi kuva tarvittaessa';
