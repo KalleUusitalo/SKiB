@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Valttikortin lomake</title>
   <link rel="stylesheet" href="style.css">
+  <!-- QuaggaJS viivakoodien skannaukseen -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <!-- Pääsovelluslogiikka -->
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
+  <h1>Valttikortin lomake</h1>
   <form id="card-form">
-    <h1>Valttikorttilomake</h1>
 
+    <!-- Henkilötiedot -->
     <div class="form-group">
       <label for="firstName">Etunimi</label>
       <input type="text" id="firstName" name="firstName" required>
@@ -20,6 +24,7 @@
       <input type="text" id="lastName" name="lastName" required>
     </div>
 
+    <!-- Kamerakuva kortista -->
     <div class="form-group">
       <label>Lisää kuva valttikortista</label>
       <div class="camera-frame" id="cameraFrame"></div>
@@ -31,6 +36,20 @@
       <input type="hidden" name="cardImage" id="cardImageInput">
     </div>
 
+    <!-- NFC-luku (Android Chrome) -->
+    <div class="form-group">
+      <button type="button" id="readNfc">Lue NFC-kortti</button>
+      <div id="nfcResult">Ei dataa</div>
+    </div>
+
+    <!-- Viivakoodin skannaus (EAN/Code128) -->
+    <div class="form-group">
+      <button type="button" id="startScan">Käynnistä viivakoodin skannaus</button>
+      <video id="barcodeVideo" autoplay playsinline></video>
+      <div id="barcodeResult">Ei koodia</div>
+    </div>
+
+    <!-- Lähetys -->
     <div class="controls">
       <button type="submit">Lähetä lomake</button>
     </div>
