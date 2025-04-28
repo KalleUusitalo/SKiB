@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Valttikortin lomake</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Pääsovelluslogiikka -->
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
@@ -39,5 +40,11 @@
       <button type="submit">Lähetä lomake</button>
     </div>
   </form>
+  <script>
+    // Alusta EmailJS
+    (function(){
+      emailjs.init("YOUR_EMAILJS_USER_ID");
+    })();
+  </script>
 </body>
 </html>
