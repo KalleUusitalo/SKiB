@@ -1,8 +1,10 @@
 export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyD3N1jRcAwSBVzEhMLfyXG37StORE4Qr4U",
+  authDomain: "skib-d8f58.firebaseapp.com",
+  databaseURL: "https://skib-d8f58-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "skib-d8f58",
+  storageBucket: "skib-d8f58.firebasestorage.app",
+  messagingSenderId: "550856600406",
+  appId: "1:550856600406:web:c8222181b81580c95684f7"
 };
