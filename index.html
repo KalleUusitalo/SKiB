@@ -6,7 +6,7 @@
   <title>Valttikortin lomake</title>
   <link rel="stylesheet" href="style.css">
   <!-- EmailJS SDK -->
-  <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+  <script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
   <!-- Pääsovelluslogiikka -->
   <script type="module" src="script.js" defer></script>
 </head>
@@ -14,8 +14,36 @@
   <header class="site-header">
     <h1>Valttikortin lomake</h1>
   </header>
-  <form id="card-form">
 
+  <form id="card-form">
+    <!-- Etunimi -->
+    <div class="form-group">
+      <label for="firstName">Etunimi</label>
+      <input type="text" id="firstName" name="firstName" required>
+    </div>
+    <!-- Sukunimi -->
+    <div class="form-group">
+      <label for="lastName">Sukunimi</label>
+      <input type="text" id="lastName" name="lastName" required>
+    </div>
+    <!-- Korttikuvan otto -->
+    <div class="form-group">
+      <label>Lisää kuva valttikortista</label>
+      <div class="camera-frame" id="cameraFrame"></div>
+      <div class="controls">
+        <button type="button" id="openCamera">Avaa kamera</button>
+        <button type="button" id="capture" disabled>Ota kuva</button>
+      </div>
+      <div class="preview" id="preview"></div>
+      <input type="hidden" name="cardImage" id="cardImageInput">
+    </div>
+    <!-- Lähetys -->
+    <div class="controls">
+      <button type="submit">Lähetä lomake</button>
+    </div>
+  </form>
+
+  <script>
     // Alusta EmailJS julkisella avaimella
     (function(){
       emailjs.init("GrJbR0Z9xXufM9WoR");
