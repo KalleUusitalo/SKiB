@@ -19,7 +19,9 @@
       padding: 0;
       overflow-x: hidden;
     }
-    *, *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
       background: var(--bg-light);
@@ -181,26 +183,16 @@
         <div class="form-grid">
           <div class="form-group">
             <label for="valtti">1. VALTTI-kortin numero (12 numeroa)</label>
-            <input
-              id="valtti"
-              name="valtti"
-              type="text"
-              inputmode="numeric"
-              pattern="\d{12}"
-              required
-              placeholder="123456789012"
-            />
+            <input id="valtti" name="valtti" type="text" inputmode="numeric" pattern="\d{12}" required placeholder="123456789012" />
+          </div>
+          <div class="form-group">
+            <button type="button" id="open-camera">Ota kuva kortista</button>
+            <input type="hidden" name="card_photo_data" id="card_photo_data" />
+            <img id="card-photo-preview" class="hidden" alt="Korttikuvan esikatselu" />
           </div>
           <div class="form-group">
             <label for="veronumero">2. Veronumero (12 numeroa, jos ei Valttia)</label>
-            <input
-              id="veronumero"
-              name="veronumero"
-              type="text"
-              inputmode="numeric"
-              pattern="\d{12}"
-              placeholder="100012345678"
-            />
+            <input id="veronumero" name="veronumero" type="text" inputmode="numeric" pattern="\d{12}" placeholder="100012345678" />
           </div>
           <div class="form-group">
             <label for="yritys">3. Yritys (palkan maksava yritys)</label>
@@ -237,13 +229,7 @@
           </div>
           <div class="form-group">
             <label for="puhelin">8. Puhelinnumero</label>
-            <input
-              id="puhelin"
-              name="puhelin"
-              type="tel"
-              required
-              placeholder="+358 44 123 1234"
-            />
+            <input id="puhelin" name="puhelin" type="tel" required placeholder="+358 44 123 1234" />
           </div>
           <div class="form-group">
             <label for="sahkoposti">9. Sähköposti</label>
@@ -261,23 +247,14 @@
             </select>
           </div>
           <div class="form-group hidden" id="kouluyhteyshenkilo_group">
-            <label for="kouluyhteyshenkilo">
-              11. Jos olet harjoittelija, koulun yhteyshenkilö
-            </label>
-            <input
-              id="kouluyhteyshenkilo"
-              name="kouluyhteyshenkilo"
-              type="text"
-              placeholder="Nimi ja puhelinnumero"
-            />
+            <label for="kouluyhteyshenkilo">11. Jos olet harjoittelija, koulun yhteyshenkilö</label>
+            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero" />
           </div>
           <div class="form-group">
             <label for="kansalaisuus">12. Kansalaisuus</label>
             <select id="kansalaisuus" name="kansalaisuus" required>
               <option value="">-- Valitse --</option>
-              <option value="foreign">
-                FOREIGN PERSONS: Complete orientation from the link
-              </option>
+              <option value="foreign">FOREIGN PERSONS: Complete orientation from the link</option>
               <option value="suomi">Suomi</option>
             </select>
           </div>
@@ -290,63 +267,20 @@
             <input id="kieli" name="kieli" type="text" required />
           </div>
           <div class="form-group">
-            <label for="ttkortti_voi">
-              15. Työturvallisuuskortti voimassa (kk/vvvv)
-            </label>
-            <input
-              id="ttkortti_voi"
-              name="ttkortti_voi"
-              type="text"
-              required
-              placeholder="08/2025"
-            />
+            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa (kk/vvvv)</label>
+            <input id="ttkortti_voi" name="ttkortti_voi" type="text" required placeholder="08/2025" />
           </div>
           <div class="form-group">
             <label for="ttkortti_num">16. Työturvallisuuskortin numero</label>
-            <input
-              id="ttkortti_num"
-              name="ttkortti_num"
-              type="text"
-              inputmode="numeric"
-              pattern="\d+"
-/>
+            <input id="ttkortti_num" name="ttkortti_num" type="text" inputmode="numeric" pattern="\d+" />
           </div>
           <div class="form-group">
-            <label for="tko_voi">
-              17. Tulityökortti voimassa (kk/vuosi) (tarvittaessa)
-            </label>
-            <input
-              id="tko_voi"
-              name="tko_voi"
-              type="text"
-              placeholder="mm/vuosi"
-/>
+            <label for="tko_voi">17. Tulityökortti voimassa (kk/vuosi) (tarvittaessa)</label>
+            <input id="tko_voi" name="tko_voi" type="text" placeholder="mm/vuosi" />
           </div>
           <div class="form-group">
             <label for="tko_num">18. Tulityökortin numero</label>
-            <input
-              id="tko_num"
-              name="tko_num"
-              type="text"
-              inputmode="numeric"
-              pattern="\d+"
-/>
-          </div>
-          <div class="form-group">
-            <label>19. Työturvallisuusorganisaatio</label>
-            <select id="tto" name="tto" required>
-              <option value="">-- Valitse --</option>
-              <option>OK</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <button type="button" id="open-camera">Ota kuva kortista</button>
-            <input type="hidden" name="card_photo_data" id="card_photo_data" />
-            <img
-              id="card-photo-preview"
-              class="hidden"
-              alt="Korttikuvan esikatselu"
-/>
+            <input id="tko_num" name="tko_num" type="text" inputmode="numeric" pattern="\d+" />
           </div>
         </div>
       </section>
@@ -374,18 +308,8 @@
       <!-- Osa 3 -->
       <section>
         <h2>Osa 3 – Tietoa kohteesta</h2>
-        <p>
-          Bss + SKiB Kampus on Porin ruotsinkielisen yhtenäiskoulun (Bss) ja
-          Svenska Kulturfonden i Björneborg-säätiön uudisrakennus- ja
-          peruskorjaushanke. Rakennuskokonaisuuteen sijoittuvat Porin
-          ruotsalaisen yhteiskoulun (Bss) ja Porin ruotsinkielisen kulttuurisäätiön
-          (SKiB) koulu- ja kulttuurikampuksen tilat.
-        </p>
-        <p>
-          Säilyvien osittain suojeltujen rakennusten kunnostamisen yhteydessä
-          toteutetaan tilamuutokset ja korjaukset. Uudisrakennus sijoittuu
-          kahteen maanpäälliseen kerrokseen ja yhteen kellarikerrokseen.
-        </p>
+        <p>Bss + SKiB Kampus on Porin ruotsinkielisen yhtenäiskoulun (Bss) ja Svenska Kulturfonden i Björneborg-säätiön uudisrakennus- ja peruskorjaushanke. Rakennuskokonaisuuteen sijoittuvat Porin ruotsalaisen yhteiskoulun (Bss) ja Porin ruotsinkielisen kulttuurisäätiön (SKiB) koulu- ja kulttuurikampuksen tilat.</p>
+        <p>Säilyvien osittain suojeltujen rakennusten kunnostamisen yhteydessä toteutetaan tilamuutokset ja korjaukset. Uudisrakennus sijoittuu kahteen maanpäälliseen kerrokseen ja yhteen kellarikerrokseen.</p>
       </section>
 
       <!-- Osa 4 -->
@@ -403,17 +327,11 @@
       <section>
         <h2>Osa 5 – Työmaa-info</h2>
         <ul>
-          <li>
-            Työmaalle saavutaan Mikonkadun ja Otavankadun pyöröportista.
-          </li>
-          <li>
-            Leimautuminen portilla tai katusiiven 1. krs aulassa.
-          </li>
+          <li>Työmaalle saavutaan Mikonkadun ja Otavankadun pyöröportista.</li>
+          <li>Leimautuminen portilla tai katusiiven 1. krs aulassa.</li>
           <li>Autojen säilyttäminen työmaalla kielletty.</li>
           <li>Kameravalvonta ja hälytysjärjestelmä.</li>
-          <li>
-            Rakennushissin käyttö koulutuksen jälkeen – pyydä käyttökoulutus.
-          </li>
+          <li>Rakennushissin käyttö koulutuksen jälkeen – pyydä koulutus.</li>
           <li>Torninosturin nostot vain luvalla.</li>
           <li>Sosiaali- ja taukotilat katusiiven 1. kerroksessa.</li>
         </ul>
@@ -428,9 +346,7 @@
         <ul>
           <li>Taukotila</li>
           <li>Miesten sosiaalitila</li>
-          <li>
-            Katusiiven sisäänkäynti (ulkona, katoksen alla)
-          </li>
+          <li>Katusiiven sisäänkäynti (ulkona, katoksen alla)</li>
           <li>Kerrostasanteet (rappukäytävä)</li>
         </ul>
       </section>
@@ -443,21 +359,12 @@
           <li>Kuvallinen henkilötunnistus näkyvillä</li>
           <li>CE/EN397-kypärä leukahihnalla</li>
           <li>Suojalasit</li>
-          <li>Turvakengät naula­suojalla</li>
+          <li>Turvakengät naulasuojalla</li>
           <li>Kuulosuojaimet tarpeen mukaan</li>
-          <li>
-            Valjaat aina aukkojen ja yli 2 m korkeuden yhteydessä
-          </li>
-          <li>
-            Valjaat teleskooppinosturin korissa
-          </li>
+          <li>Valjaat aina aukkojen ja yli 2 m korkeuden yhteydessä</li>
+          <li>Valjaat teleskooppinosturin korissa</li>
         </ul>
-        <p>
-          Työturvallisuushavainto: 
-          <a href="http://teehavainto.fi/" target="_blank">
-            teehavainto.fi
-          </a>
-        </p>
+        <p>Työturvallisuushavainto: <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a></p>
       </section>
 
       <!-- Osa 8 -->
@@ -465,80 +372,40 @@
         <h2>Osa 8 – Työmaan erityispiirteet</h2>
         <ul>
           <li>Ympäröivä kaupunkialue – huomioi asukkaat ja liiketilat</li>
-          <li>
-            Koulun ja päiväkodin saattoliikenne, oppilaat ja opettajat
-          </li>
-          <li>
-            Ahdas alue – varastointipaikat sovittava MVR-Yhtymän kanssa
-          </li>
+          <li>Koulun ja päiväkodin saattoliikenne, oppilaat ja opettajat</li>
+          <li>Ahdas alue – varastointipaikat sovittava MVR-Yhtymän kanssa</li>
         </ul>
       </section>
 
       <!-- Osa 9 -->
       <section>
         <h2>Osa 9 – Puhtauden- ja jätteidenhallinta</h2>
-        <p>
-          Uudisrakennustyömaalla P1-vaihe otetaan käyttöön runkovaiheen jälkeen.
-          Peruskorjatuissa osissa P1-luokka purkutöistä alkaen.
-        </p>
+        <p>Uudisrakennustyömaalla P1-vaihe otetaan käyttöön runkovaiheen jälkeen. Peruskorjatuissa osissa P1-luokka purkutöistä alkaen.</p>
         <ul>
           <li>Jäteastiat kannellisia (ei avo-astioita)</li>
-          <li>
-            Harjasiivous kielletty – oma työalue siivottava päivittäin
-          </li>
-          <li>
-            Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli,
-            pahvi, kipsilevy, vaaralliset jätteet
-          </li>
+          <li>Harjasiivous kielletty – oma työalue siivottava päivittäin</li>
+          <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puu, metalli, pahvi, kipsilevy, vaaralliset jätteet</li>
         </ul>
       </section>
 
       <!-- Osa 10 -->
       <section>
         <h2>Osa 10 – Kosteudenhallinta</h2>
-        <p>
-          Tavoitteena estää kosteusvauriot. Noudata pääurakoitsijan
-          ohjeita ja hyvää rakennustapaa. Ilmoita havaitsemistasi
-          poikkeamista viipymättä.
-        </p>
+        <p>Tavoitteena estää kosteusvauriot. Noudata pääurakoitsijan ohjeita ja hyvää rakennustapaa. Ilmoita havaitsemistasi poikkeamista viipymättä.</p>
       </section>
 
       <!-- Osa 11 -->
       <section>
         <h2>Osa 11 – Työmaan henkilöstö</h2>
         <ul>
-          <li>
-            Veli-Matti Järvenpää – 050 521 8333 
-            (Vastaava työnjohtaja, MVR-Yhtymä Oy)
-          </li>
-          <li>
-            Mika Kangasniemi – 050 305 1492 
-            (Työsuojelupäällikkö, MVR-Yhtymä Oy)
-          </li>
-          <li>
-            Joonas Kekki – 050 436 9411 
-            (Työsuojelukoordinaattori, Prepon Oy)
-          </li>
-          <li>
-            Antti Puhakka – 050 592 6259 
-            (Työsuojeluvaltuutettu, MVR-Yhtymä Oy)
-          </li>
-          <li>
-            Kalle Uusitalo – 044 401 3286 
-            (Työmaainsinööri, MVR-Yhtymä Oy)
-          </li>
-          <li>
-            Teemu Riita – 040 072 2022 
-            (Työnjohtaja, uudisrakennus ja pihasiipi)
-          </li>
-          <li>
-            Ville Mattila – 043 826 6944 
-            (Työnjohtaja, uudisrakennus ja pihasiipi)
-          </li>
-          <li>
-            Tommi Varjo – 044 291 9292 
-            (Työnjohtaja, katusiipi)
-          </li>
+          <li>Veli-Matti Järvenpää – 050 521 8333 (Vastaava työnjohtaja, MVR-Yhtymä Oy)</li>
+          <li>Mika Kangasniemi – 050 305 1492 (Työsuojelupäällikkö, MVR-Yhtymä Oy)</li>
+          <li>Joonas Kekki – 050 436 9411 (Työsuojelukoordinaattori, Prepon Oy)</li>
+          <li>Antti Puhakka – 050 592 6259 (Työsuojeluvaltuutettu, MVR-Yhtymä Oy)</li>
+          <li>Kalle Uusitalo – 044 401 3286 (Työmaainsinööri, MVR-Yhtymä Oy)</li>
+          <li>Teemu Riita – 040 072 2022 (Työnjohtaja, uudisrakennus ja pihasiipi)</li>
+          <li>Ville Mattila – 043 826 6944 (Työnjohtaja, uudisrakennus ja pihasiipi)</li>
+          <li>Tommi Varjo – 044 291 9292 (Työnjohtaja, katusiipi)</li>
         </ul>
       </section>
 
@@ -550,16 +417,9 @@
           <canvas id="signature-pad" class="signature"></canvas>
         </div>
         <div class="btn-group">
-          <button type="button" id="clear-signature">
-            Tyhjennä allekirjoitus
-          </button>
+          <button type="button" id="clear-signature">Tyhjennä allekirjoitus</button>
         </div>
-        <input
-          type="hidden"
-          name="signature_data"
-          id="signature_data"
-          required
-        />
+        <input type="hidden" name="signature_data" id="signature_data" required />
       </section>
 
       <button type="submit">Lähetä lomake</button>
@@ -660,7 +520,7 @@
       modal.classList.remove('hidden');
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' }
+          video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 2160 } }
         });
         video.srcObject = stream;
       } catch (err) {
@@ -672,12 +532,28 @@
     takeBtn.addEventListener('click', () => {
       const w = video.videoWidth;
       const h = video.videoHeight;
-      const c = document.createElement('canvas');
-      c.width = w;
-      c.height = h;
-      const cx = c.getContext('2d');
-      cx.drawImage(video, 0, 0, w, h);
-      const dataURL = c.toDataURL('image/png');
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = w;
+      tempCanvas.height = h;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(video, 0, 0, w, h);
+
+      const overlay = document.querySelector('.camera-overlay').getBoundingClientRect();
+      const videoRect = video.getBoundingClientRect();
+      const scaleX = w / videoRect.width;
+      const scaleY = h / videoRect.height;
+      const cropX = (overlay.left - videoRect.left) * scaleX;
+      const cropY = (overlay.top - videoRect.top) * scaleY;
+      const cropW = overlay.width * scaleX;
+      const cropH = overlay.height * scaleY;
+
+      const cropCanvas = document.createElement('canvas');
+      cropCanvas.width = cropW;
+      cropCanvas.height = cropH;
+      const cropCtx = cropCanvas.getContext('2d');
+      cropCtx.drawImage(tempCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+      const dataURL = cropCanvas.toDataURL('image/png');
       cardInput.value = dataURL;
       cardPreview.src = dataURL;
       cardPreview.classList.remove('hidden');
