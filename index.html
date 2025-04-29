@@ -59,7 +59,7 @@
     }
     .form-group { display: flex; flex-direction: column; }
     label { font-weight: bold; margin-bottom: 0.5em; }
-    input, select, textarea, button, canvas {
+    input, select, textarea, button, canvas, img {
       font-size: 1rem;
       padding: 0.5em;
       border: 1px solid #ccc;
@@ -86,6 +86,13 @@
       cursor: crosshair;
       height: 200px;
       width: 100%;
+    }
+    #signature-preview {
+      display: block;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      margin-top: var(--spacing);
+      max-width: 100%;
     }
     #camera-modal {
       position: fixed; top: 0; left: 0;
@@ -118,14 +125,9 @@
   <script src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
   <script>
     const CLIENT_ID = '532156794647-r26r57kbpamkmvea5vtc6hdnjahjjqe0.apps.googleusercontent.com';
-    const SCOPES = [
-      'https://www.googleapis.com/auth/drive.file',
-      'https://www.googleapis.com/auth/gmail.send'
-    ].join(' ');
-    const DISCOVERY_DOCS = [
-      'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
-      'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'
-    ];
+    const SCOPES = 'https://www.googleapis.com/auth/gmail.send';
+    const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'];
+
     function handleClientLoad() {
       gapi.load('client:auth2', initClient);
     }
@@ -141,49 +143,6 @@
       if (!auth.isSignedIn.get()) {
         await auth.signIn();
       }
-      return auth.currentUser.get().getAuthResponse().access_token;
-    }
-    async function uploadBlobToDrive(blob, filename) {
-      const token = await ensureSignedIn();
-      const metadata = { name: filename, mimeType: blob.type };
-      const boundary = '-------314159265358979323846';
-      const delim = "\r\n--" + boundary + "\r\n";
-      const close = "\r\n--" + boundary + "--";
-      const reader = new FileReader();
-      return new Promise((resolve, reject) => {
-        reader.onload = async () => {
-          const base64Data = btoa(new Uint8Array(reader.result)
-            .reduce((data, byte) => data + String.fromCharCode(byte), ''));
-          const multipart = delim +
-            'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-            JSON.stringify(metadata) +
-            delim +
-            'Content-Type: ' + blob.type + '\r\n' +
-            'Content-Transfer-Encoding: base64\r\n\r\n' +
-            base64Data +
-            close;
-          try {
-            const res = await fetch(
-              'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=webViewLink',
-              {
-                method: 'POST',
-                headers: {
-                  'Authorization': 'Bearer ' + token,
-                  'Content-Type': 'multipart/related; boundary=' + boundary
-                },
-                body: multipart
-              }
-            );
-            const json = await res.json();
-            if (!res.ok) throw new Error('Drive API error: ' + JSON.stringify(json));
-            resolve(json.webViewLink);
-          } catch (e) {
-            reject(e);
-          }
-        };
-        reader.onerror = err => reject(err);
-        reader.readAsArrayBuffer(blob);
-      });
     }
     function makeEmailBody(to, cc, subject, html) {
       const headers = [
@@ -195,9 +154,10 @@
         html
       ].join('\r\n');
       return btoa(unescape(encodeURIComponent(headers)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
     }
     async function sendEmail(to, cc, subject, html) {
+      await ensureSignedIn();
       const raw = makeEmailBody(to, cc, subject, html);
       await gapi.client.gmail.users.messages.send({
         userId: 'me',
@@ -224,20 +184,21 @@
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label for="valtti">1. VALTTI-kortin numero (12 numeroa)</label>
+            <label for="valtti">1. VALTTI-kortin numero (12 merkkiä)</label>
             <input id="valtti" name="valtti" type="text" pattern="\d{12}" required placeholder="123456789012" />
           </div>
           <div class="form-group">
+            <label for="card_photo">1b. Korttikuvan otto</label>
             <button type="button" id="open-camera">Ota kuva kortista</button>
             <input type="hidden" name="card_photo_data" id="card_photo_data" />
             <img id="card-photo-preview" class="hidden" alt="Korttikuvan esikatselu" />
           </div>
           <div class="form-group">
-            <label for="veronumero">2. Veronumero (jos ei Valttikorttia)</label>
+            <label for="veronumero">2. Veronumero (jos ei Valttia)</label>
             <input id="veronumero" name="veronumero" type="text" pattern="\d{12}" placeholder="100012345678" />
           </div>
           <div class="form-group">
-            <label for="yritys">3. Yritys (palkan maksava)</label>
+            <label for="yritys">3. Yritys</label>
             <input id="yritys" name="yritys" type="text" required />
           </div>
           <div class="form-group">
@@ -309,20 +270,20 @@
             <input id="kieli" name="kieli" type="text" required />
           </div>
           <div class="form-group">
-            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa (kk/vuosi)</label>
-            <input id="ttkortti_voi" name="ttkortti_voi" type="text" required placeholder="MM/YYYY" />
+            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa</label>
+            <input id="ttkortti_voi" name="ttkortti_voi" type="text" placeholder="MM/YYYY" required />
           </div>
           <div class="form-group">
-            <label for="ttkortti_num">16. Työturvallisuuskortin numero</label>
-            <input id="ttkortti_num" name="ttkortti_num" type="text" pattern="\d+" placeholder="Numero" />
+            <label for="ttkortti_num">16. Nro</label>
+            <input id="ttkortti_num" name="ttkortti_num" type="text" placeholder="Kortin numero" />
           </div>
           <div class="form-group">
-            <label for="tko_voi">17. Tulityökortti voimassa (kk/vuosi)</label>
+            <label for="tko_voi">17. Tulityökortti voimassa</label>
             <input id="tko_voi" name="tko_voi" type="text" placeholder="MM/YYYY" />
           </div>
           <div class="form-group">
-            <label for="tko_num">18. Tulityökortin numero</label>
-            <input id="tko_num" name="tko_num" type="text" pattern="\d+" placeholder="Numero" />
+            <label for="tko_num">18. Nro</label>
+            <input id="tko_num" name="tko_num" type="text" placeholder="Kortin numero" />
           </div>
         </div>
       </section>
@@ -345,7 +306,7 @@
           <li><strong>Pääurakoitsija:</strong> Valvoo perehdytyksen kokonaisuutta</li>
           <li><strong>Työnjohtaja:</strong> Vastaa aliurakoitsijoiden perehdytyksestä</li>
           <li><strong>Perehdyttäjä:</strong> Esittelee kohteen turvallisuusnäkökohdat</li>
-          <li><strong>Työntekijä:</strong> Osallistuu aktiivisesti ja ilmoittaa havainnoista</li>
+          <li><strong>Työntekijä:</strong> Osallistuu aktiivisesti ja ilmoittaa riskeistä</li>
         </ul>
       </section>
 
@@ -389,7 +350,7 @@
       <section>
         <h2>Osa 7 – Henkilösuojaimet</h2>
         <ul>
-          <li>CE/EN397 kypärä leukahihnalla</li>
+          <li>CE/EN397-kypärä leukahihnalla</li>
           <li>Turvakengät naulasuojilla</li>
           <li>Suojalasit, kuulonsuojaimet, hengityssuojaimet</li>
         </ul>
@@ -442,6 +403,7 @@
           <button type="button" id="clear-signature">Tyhjennä allekirjoitus</button>
         </div>
         <input type="hidden" name="signature_data" id="signature_data" required />
+        <img id="signature-preview" class="hidden" alt="Allekirjoituksen esikatselu" />
       </section>
 
       <button type="submit">Lähetä lomake</button>
@@ -459,141 +421,124 @@
   </main>
 
   <script>
-    // Signature pad + scroll lock
+    // Signature pad logic
     const body = document.body;
     const canvasSig = document.getElementById('signature-pad');
     const ctxSig = canvasSig.getContext('2d');
-    let drawing=false, lastX=0, lastY=0, origOverflow;
+    const sigPreview = document.getElementById('signature-preview');
+    let drawing = false, lastX = 0, lastY = 0, origOverflow;
 
     function resizeSig() {
-      const r=window.devicePixelRatio||1;
-      const w=canvasSig.offsetWidth, h=canvasSig.offsetHeight;
-      canvasSig.width=w*r; canvasSig.height=h*r;
-      ctxSig.scale(r,r); ctxSig.lineCap='round';
-      ctxSig.lineJoin='round'; ctxSig.lineWidth=2;
-      ctxSig.clearRect(0,0,w,h);
+      const r = window.devicePixelRatio || 1;
+      const w = canvasSig.offsetWidth, h = canvasSig.offsetHeight;
+      canvasSig.width = w * r;
+      canvasSig.height = h * r;
+      ctxSig.scale(r, r);
+      ctxSig.lineCap = 'round';
+      ctxSig.lineJoin = 'round';
+      ctxSig.lineWidth = 2;
+      ctxSig.clearRect(0, 0, w, h);
     }
     window.addEventListener('resize', resizeSig);
     resizeSig();
 
     function startSig(e) {
-      e.preventDefault(); drawing=true;
-      origOverflow=body.style.overflow; body.style.overflow='hidden';
-      const rect=canvasSig.getBoundingClientRect();
-      lastX=(e.clientX||e.touches[0].clientX)-rect.left;
-      lastY=(e.clientY||e.touches[0].clientY)-rect.top;
-    }
-    function endSig() { drawing=false; body.style.overflow=origOverflow; }
-    function moveSig(e) {
-      if(!drawing) return;
       e.preventDefault();
-      const rect=canvasSig.getBoundingClientRect();
-      const x=(e.clientX||e.touches[0].clientX)-rect.left;
-      const y=(e.clientY||e.touches[0].clientY)-rect.top;
-      ctxSig.beginPath();
-      ctxSig.moveTo(lastX,lastY);
-      ctxSig.lineTo(x,y);
-      ctxSig.stroke();
-      lastX=x; lastY=y;
+      drawing = true;
+      origOverflow = body.style.overflow;
+      body.style.overflow = 'hidden';
+      const rect = canvasSig.getBoundingClientRect();
+      lastX = (e.clientX || e.touches[0].clientX) - rect.left;
+      lastY = (e.clientY || e.touches[0].clientY) - rect.top;
     }
-    ['pointerdown','touchstart'].forEach(evt=>canvasSig.addEventListener(evt,startSig));
-    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt=>canvasSig.addEventListener(evt,endSig));
-    ['pointermove','touchmove'].forEach(evt=>canvasSig.addEventListener(evt,moveSig));
-    document.getElementById('clear-signature').addEventListener('click', resizeSig);
+    function endSig() {
+      drawing = false;
+      body.style.overflow = origOverflow;
+      const dataURL = canvasSig.toDataURL('image/png');
+      document.getElementById('signature_data').value = dataURL;
+      sigPreview.src = dataURL;
+      sigPreview.classList.remove('hidden');
+    }
+    function moveSig(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const rect = canvasSig.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+      ctxSig.beginPath();
+      ctxSig.moveTo(lastX, lastY);
+      ctxSig.lineTo(x, y);
+      ctxSig.stroke();
+      lastX = x; lastY = y;
+    }
+    ['pointerdown', 'touchstart'].forEach(evt => canvasSig.addEventListener(evt, startSig));
+    ['pointerup','pointerout','touchend','touchcancel'].forEach(evt => canvasSig.addEventListener(evt, endSig));
+    ['pointermove','touchmove'].forEach(evt => canvasSig.addEventListener(evt, moveSig));
+    document.getElementById('clear-signature').addEventListener('click', ()=>{
+      resizeSig();
+      sigPreview.classList.add('hidden');
+    });
 
-    // Camera modal
-    const openCam=document.getElementById('open-camera');
-    const camModal=document.getElementById('camera-modal');
-    const video=document.getElementById('camera-video');
-    const takePhoto=document.getElementById('take-photo');
-    const closePhoto=document.getElementById('close-camera');
-    const cardInput=document.getElementById('card_photo_data');
-    const cardPreview=document.getElementById('card-photo-preview');
+    // Camera modal logic
+    const openCam = document.getElementById('open-camera');
+    const camModal = document.getElementById('camera-modal');
+    const video = document.getElementById('camera-video');
+    const takePhoto = document.getElementById('take-photo');
+    const closePhoto = document.getElementById('close-camera');
+    const cardInput = document.getElementById('card_photo_data');
+    const cardPreview = document.getElementById('card-photo-preview');
     let camStream;
 
-    openCam.addEventListener('click', async()=>{
+    openCam.addEventListener('click', async () => {
       camModal.classList.remove('hidden');
       try {
-        camStream=await navigator.mediaDevices.getUserMedia({
-          video:{facingMode:'environment',width:{ideal:4096},height:{ideal:2160}}
-        });
-        video.srcObject=camStream;
-      } catch(err) {
-        alert('Kameran käyttö ei onnistu: '+(err.message||err));
+        camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = camStream;
+      } catch (err) {
+        alert('Kameran käyttö ei onnistu: ' + err.message);
         camModal.classList.add('hidden');
       }
     });
 
-    takePhoto.addEventListener('click', async()=>{
-      const w=video.videoWidth, h=video.videoHeight;
-      const tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
-      tmp.getContext('2d').drawImage(video,0,0,w,h);
-      const rect=document.querySelector('.camera-overlay').getBoundingClientRect();
-      const vrect=video.getBoundingClientRect();
-      const scaleX=w/vrect.width, scaleY=h/vrect.height;
-      const sx=(rect.left-vrect.left)*scaleX, sy=(rect.top-vrect.top)*scaleY;
-      const sw=rect.width*scaleX, sh=rect.height*scaleY;
-      const crop=document.createElement('canvas');
-      crop.width=sw; crop.height=sh;
-      crop.getContext('2d').drawImage(tmp,sx,sy,sw,sh,0,0,sw,sh);
-      try {
-        const blob=await new Promise(r=>crop.toBlob(r,'image/jpeg',0.7));
-        const url=await uploadBlobToDrive(blob,'valtti_'+Date.now()+'.jpg');
-        cardInput.value=url; cardPreview.src=url; cardPreview.classList.remove('hidden');
-      } catch(e){
-        console.error(e);
-        alert('Drive-lataus epäonnistui: '+(e.message||JSON.stringify(e)));
-      }
+    takePhoto.addEventListener('click', () => {
+      const w = video.videoWidth, h = video.videoHeight;
+      const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h;
+      tmp.getContext('2d').drawImage(video, 0, 0, w, h);
+      const dataURL = tmp.toDataURL('image/jpeg', 0.8);
+      cardInput.value = dataURL;
+      cardPreview.src = dataURL;
+      cardPreview.classList.remove('hidden');
       camModal.classList.add('hidden');
-      camStream.getTracks().forEach(t=>t.stop());
-    });
-    closePhoto.addEventListener('click',()=>{
-      camModal.classList.add('hidden');
-      if(camStream) camStream.getTracks().forEach(t=>t.stop());
+      camStream.getTracks().forEach(t => t.stop());
     });
 
-    // Submit -> upload signature + send email
-    document.getElementById('orientationForm').addEventListener('submit',async function(e){
+    closePhoto.addEventListener('click', () => {
+      camModal.classList.add('hidden');
+      if (camStream) camStream.getTracks().forEach(t => t.stop());
+    });
+
+    // Submit handler → send email via Gmail API
+    document.getElementById('orientationForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       try {
-        // Upload signature
-        const sigBlob=await new Promise(r=>canvasSig.toBlob(r,'image/jpeg',0.7));
-        const sigUrl=await uploadBlobToDrive(sigBlob,'sig_'+Date.now()+'.jpg');
-        document.getElementById('signature_data').value=sigUrl;
-
-        // Build email HTML
-        const form=this.elements;
-        let html=`<h1>Perehdytyslomake – BSS+SKiB Kampus</h1>`;
-        html+=`<p><strong>Valtti-kortin numero:</strong> ${form.valtti.value}</p>`;
-        html+=`<p><strong>Korttikuvan linkki:</strong> <a href="${form.card_photo_data.value}">${form.card_photo_data.value}</a></p>`;
-        html+=`<p><strong>Veronumero:</strong> ${form.veronumero.value}</p>`;
-        html+=`<p><strong>Yritys:</strong> ${form.yritys.value}</p>`;
-        html+=`<p><strong>Tilaaja:</strong> ${form.tilaaja.value}</p>`;
-        html+=`<p><strong>Sukunimi:</strong> ${form.sukunimi.value}</p>`;
-        html+=`<p><strong>Etunimi:</strong> ${form.etunimi.value}</p>`;
-        html+=`<p><strong>Puhelin:</strong> ${form.puhelin.value}</p>`;
-        html+=`<p><strong>Sähköposti:</strong> ${form.sahkoposti.value}</p>`;
-        html+=`<p><strong>Rooli:</strong> ${form.rooli.value}</p>`;
-        if(form.kouluyhteyshenkilo.value) html+=`<p><strong>Kouluyhteyshenk.:</strong> ${form.kouluyhteyshenkilo.value}</p>`;
-        html+=`<p><strong>Kansalaisuus:</strong> ${form.kansalaisuus.value}</p>`;
-        html+=`<p><strong>Työskentelyvaltio:</strong> ${form.pvaltion.value}</p>`;
-        html+=`<p><strong>Kieli:</strong> ${form.kieli.value}</p>`;
-        html+=`<p><strong>Työturvallisuuskortti voimassa:</strong> ${form.ttkortti_voi.value}, numero: ${form.ttkortti_num.value}</p>`;
-        html+=`<p><strong>Tulityökortti voimassa:</strong> ${form.tko_voi.value}, numero: ${form.tko_num.value}</p>`;
-        html+=`<p><strong>Allekirjoitus:</strong> <a href="${sigUrl}">${sigUrl}</a></p>`;
-
-        // Send via Gmail API
+        await ensureSignedIn();
+        const form = this.elements;
+        let html = `<h1>Perehdytyslomake – BSS + SKiB Kampus</h1>`;
+        html += `<p><strong>Valtti-kortin numero:</strong> ${form.valtti.value}</p>`;
+        html += `<p><strong>Korttikuvan esikatselu:</strong><br><img src="${form.card_photo_data.value}" style="max-width:100%;"></p>`;
+        html += `<p><strong>Allekirjoitus:</strong><br><img src="${form.signature_data.value}" style="max-width:300px;"></p>`;
+        // ... voit lisätä muita kenttiä samalla tavalla ...
         const userEmail = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
         await sendEmail(
           'kalle.uusitalo@mvr-yhtyma.fi',
           userEmail,
-          'Perehdytyslomake täytetty: ' + form.etunimi.value + ' ' + form.sukunimi.value,
+          'Perehdytyslomake: ' + form.etunimi.value + ' ' + form.sukunimi.value,
           html
         );
         alert('Sähköposti lähetetty onnistuneesti!');
-      } catch(err) {
+      } catch (err) {
         console.error(err);
-        alert('Lähetys epäonnistui: ' + (err.message || JSON.stringify(err)));
+        alert('Lähetys epäonnistui: ' + err.message);
       }
     });
   </script>
