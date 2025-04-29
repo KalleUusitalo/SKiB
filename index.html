@@ -20,11 +20,10 @@
       max-width: 400px;
       width: 100%;
     }
-    /* Videonäkymä ja rajaus */
     .video-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 62.5%; /* 16:10 */
+      padding-top: 62.5%;
       background: #000;
       overflow: hidden;
       border-radius: .5rem;
@@ -40,11 +39,10 @@
     #overlay {
       position: absolute;
       top: 23.5%; left: 8%;
-      width: 84%; height: 52.97%; /* credit-card ratio */
+      width: 84%; height: 52.97%;
       pointer-events: none;
       border-radius: .5rem;
     }
-    /* Lopullinen kuva responsiivisena luottokorttina */
     #captureCanvas {
       display: none;
       width: 100%;
@@ -70,7 +68,6 @@
                placeholder="sahkoposti@esimerkki.fi" required>
       </div>
 
-      <!-- Kamera-osio -->
       <div id="camera-container" class="mb-3 text-center">
         <button type="button" id="openCameraBtn" class="btn btn-secondary">
           Ota kuva kortista
@@ -109,7 +106,6 @@
     const responseDiv   = document.getElementById('response');
     let stream = null;
 
-    // Avaa kamera vasta napista
     openCameraBtn.addEventListener('click', async () => {
       try {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -123,11 +119,10 @@
         openCameraBtn.classList.add('d-none');
       } catch (err) {
         console.error(err);
-        responseDiv.textContent = 'Kameran avaaminen epäonnistui. Yritä uudelleen.';
+        responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
       }
     });
 
-    // Rajaa ja skaalaa kuva
     snapBtn.addEventListener('click', () => {
       const vRect  = video.getBoundingClientRect();
       const oRect  = overlay.getBoundingClientRect();
@@ -138,13 +133,11 @@
       const sw     = oRect.width  * scaleX;
       const sh     = oRect.height * scaleY;
 
-      // Väliaikainen canvas
       const tmp = document.createElement('canvas');
       tmp.width  = sw;
       tmp.height = sh;
       tmp.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
 
-      // Skaalaa max-leveyteen 600px
       const maxW = 600;
       const scale = Math.min(1, maxW / sw);
       const fw = sw * scale, fh = sh * scale;
@@ -160,7 +153,6 @@
       retakeBtn.classList.remove('d-none');
     });
 
-    // Uudelleen kuvaus
     retakeBtn.addEventListener('click', async () => {
       canvas.style.display = 'none';
       retakeBtn.classList.add('d-none');
@@ -175,11 +167,10 @@
         videoWrapper.style.display = 'block';
       } catch (err) {
         console.error(err);
-        responseDiv.textContent = 'Kameran avaaminen epäonnistui. Yritä uudelleen.';
+        responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
       }
     });
 
-    // Lähetä lomake
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const name  = form.name.value.trim();
@@ -209,11 +200,11 @@
           openCameraBtn.classList.remove('d-none');
         } else {
           console.error(json.error);
-          responseDiv.textContent = 'Lähetys epäonnistui. Tarkista tiedot ja yritä uudelleen.';
+          responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
         }
       } catch (err) {
         console.error(err);
-        responseDiv.textContent = 'Lähetys epäonnistui. Tarkista tiedot ja yritä uudelleen.';
+        responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
       }
     });
   </script>
