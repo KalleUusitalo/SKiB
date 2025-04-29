@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ota tai lataa kuva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative">
+    <h1 class="text-2xl font-semibold text-center mb-6">Ota tai lataa kuva</h1>
+
+    <!-- Kamera- ja tiedostovalinta -->
+    <div class="flex space-x-2 mb-4">
+      <button id="open-camera"
+              class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Ota kuva
+      </button>
+      <label for="fileupload"
+             class="flex-1 py-2 bg-indigo-600 text-white text-center rounded-lg hover:bg-indigo-700 cursor-pointer transition">
+        Lataa tiedosto
+      </label>
+      <input type="file"
+             id="fileupload"
+             accept="image/*"
+             class="hidden">
+    </div>
+
+    <!-- Lähetä-lomake -->
+    <form id="send-form"
+          action="https://script.google.com/macros/s/AKfycbx8HcZRpyKQLU3sxMBlj6irl09ZztFoSkLbTxImnTnTcSO5OaS-fiPKGraRKJtHpyYb_Q/exec"
+          method="post"
+          target="hidden_iframe">
+      <input type="hidden" name="filename"    id="filename">
+      <input type="hidden" name="file"        id="file">
+      <input type="hidden" name="imageformat" id="imageformat">
+      <button id="send-button"
+              type="submit"
+              disabled
+              class="w-full py-3 bg-green-600 text-white rounded-lg opacity-50 cursor-not-allowed">
+        Lähetä
+      </button>
+    </form>
+
+    <!-- Esikatselu & status -->
+    <div id="preview" class="mt-4"></div>
+    <div id="status" class="mt-6 text-center text-lg text-gray-800 hidden"></div>
+
+    <!-- Piilotettu iframe -->
+    <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
+
+    <!-- Kamera-overlay -->
+    <div id="camera-overlay"
+         class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+      <div class="relative w-[300px] h-[190px] rounded-xl overflow-hidden bg-black ring-4 ring-white">
+        <video id="video"
+               class="absolute inset-0 w-full h-full object-cover"
+               autoplay playsinline></video>
+      </div>
+      <button id="capture-button"
+              class="absolute bottom-20 bg-white text-black py-2 px-6 rounded-full shadow-lg hover:bg-gray-200 transition">
+        Ota kuva
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const openBtn    = document.getElementById('open-camera');
+    const fileupload = document.getElementById('fileupload');
+    const overlay    = document.getElementById('camera-overlay');
+    const video      = document.getElementById('video');
+    const captureBtn = document.getElementById('capture-button');
+    const preview    = document.getElementById('preview');
+    const form       = document.getElementById('send-form');
+    const sendBtn    = document.getElementById('send-button');
+    const filenameI  = document.getElementById('filename');
+    const fileI      = document.getElementById('file');
+    const fmtI       = document.getElementById('imageformat');
+    const statusDiv  = document.getElementById('status');
+
+    let stream, awaitingResponse = false;
+
+    // 1) Avaa kamera
+    openBtn.addEventListener('click', async () => {
+      overlay.classList.remove('hidden');
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
+      });
+      video.srcObject = stream;
+    });
+
+    // 2) Ota kuva ja crop
+    captureBtn.addEventListener('click', () => {
+      const vh = video.videoHeight, vw = video.videoWidth;
+      const aspect = 1.585;
+      const h = vh, w = Math.floor(h*aspect);
+      const sx = Math.floor((vw-w)/2), sy = 0;
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(video, sx, sy, w, h, 0, 0, w, h);
+      stream.getTracks().forEach(t=>t.stop());
+      overlay.classList.add('hidden');
+      handleDataURL(canvas.toDataURL('image/jpeg',0.8));
+    });
+
+    // 3) Tiedoston lataus
+    fileupload.addEventListener('change', () => {
+      const file = fileupload.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => handleDataURL(evt.target.result);
+      reader.readAsDataURL(file);
+    });
+
+    // 4) Käsittele Base64-data & esikatselu
+    function handleDataURL(dataURL) {
+      preview.innerHTML = `<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
+      const [hdr, b64] = dataURL.split(',');
+      const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
+      const ext  = mime.split('/')[1].toLowerCase();
+      filenameI.value = `kuva_${Date.now()}.${ext}`;
+      fileI.value     = b64;
+      fmtI.value      = ext;
+      sendBtn.disabled = false;
+      sendBtn.classList.remove('opacity-50','cursor-not-allowed');
+      openBtn.classList.add('hidden');
+    }
+
+    // 5) Palauta odotustila lähetettäessä
+    form.addEventListener('submit', () => {
+      awaitingResponse = true;
+      statusDiv.textContent = 'Lähetetään…';
+      statusDiv.classList.remove('hidden','error');
+    });
+
+    // 6) Kuuntele postMessage vastaukset
+    window.addEventListener('message', event => {
+      if (!awaitingResponse) return;
+      awaitingResponse = false;
+      const res = event.data;
+      if (res.error) {
+        statusDiv.textContent = 'Virhe: ' + res.error;
+        statusDiv.classList.add('error');
+      } else {
+        statusDiv.textContent =
+          'Kiitos! Tervetuloa turvalliselle työmaalle – ' +
+          'Hae MVR:n toimistosta "Perehdytetty" tarra';
+      }
+      setTimeout(() => {
+        preview.innerHTML = '';
+        sendBtn.disabled  = true;
+        sendBtn.classList.add('opacity-50','cursor-not-allowed');
+        openBtn.classList.remove('hidden');
+        statusDiv.classList.add('hidden');
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
