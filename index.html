@@ -5,11 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Perehdytyslomake</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Estä sivun rullaus allekirjoitustilassa */
+    #signature-pad.active {
+      touch-action: none;
+      overscroll-behavior: contain;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 py-8">
   <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg space-y-8">
     <h1 class="text-3xl font-bold">MVR-Yhtymä Oy</h1>
-    <h2 class="text-2xl font-semibold">Perehdytyslomake<br/>Bss + SKiB Kampus työmaa</h2>
+    <h2 class="text-2xl font-semibold">Perehdytyslomake – Bss + SKiB Kampus työmaa</h2>
 
     <form id="send-form"
           action="https://script.google.com/macros/s/AKfycbx8HcZRpyKQLU3sxMBlj6irl09ZztFoSkLbTxImnTnTcSO5OaS-fiPKGraRKJtHpyYb_Q/exec"
@@ -23,300 +30,61 @@
 
         <p>
           <strong>FOREIGN PERSONS:</strong> Complete the orientation from the attached link.<br/>
-          <strong>Ulkomaalaiset henkilöt:</strong> Suorita perehdytys seuraavasta linkistä:<br/>
+          <strong>Ulkomaalaiset henkilöt:</strong> Suorita perehdytys
           <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank" class="text-blue-600 underline">
-            https://forms.office.com/e/rSUhYcH6DK
-          </a>
+            tästä linkistä
+          </a>.
         </p>
 
         <div class="grid grid-cols-1 gap-4">
           <div>
             <label class="block mb-1">1. Syötä VALTTI-kortin numero (12 merkkiä):</label>
-            <input type="text" name="valttikortti" pattern="\d{12}" required
+            <input type="text" name="valttikortti" id="valttikortti"
+                   pattern="\d{12}" required
                    class="w-full border px-3 py-2 rounded"/>
-            <small class="text-gray-600">Valttikortin numero on 12-merkki­nen numerosarja viivakoodin alapuolella.</small>
+            <small class="text-gray-600">
+              Valttikortin numero on 12-merkki­nen numerosarja viivakoodin alapuolella.
+            </small>
           </div>
+
+          <!-- Kuvaosio Osa 1 jälkeen -->
           <div>
-            <label class="block mb-1">2. Veronumero (jos valttikorttia ei ole):</label>
-            <input type="text" name="veronumero" pattern="\d{12}"
-                   class="w-full border px-3 py-2 rounded"/>
-            <small class="text-gray-600">Veronumero on 12-numeroinen tunnus. Esim. “100012345678”.</small>
-          </div>
-          <div>
-            <label class="block mb-1">3. Yritys (Työntekijän palkan maksava):</label>
-            <input type="text" name="yritys" required
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">4. Tilaaja:</label>
-            <select name="tilaaja" required class="w-full border px-3 py-2 rounded">
-              <option value="">— Valitse —</option>
-              <option>Svenska Kulturfonden i Björneborg -säätiö</option>
-              <option>MVR-Yhtymä Oy</option>
-              <option>Ilmastointi Salminen Oy</option>
-              <option>Mekeltek Oy</option>
-              <option>Prepon Oy</option>
-              <option>Vehmasputki Oy</option>
-              <option>Timantti-Nieminen Oy</option>
-              <option>Paloff Sammutusjärjestelmät Oy</option>
-              <option>Trentec Oy</option>
-              <option>En tiedä</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-1">5. Syntymäaika (pp.kk.vvvv):</label>
-            <input type="date" name="syntymapaiva" required
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block mb-1">6. Sukunimi:</label>
-              <input type="text" name="sukunimi" required
-                     class="w-full border px-3 py-2 rounded"/>
+            <label class="block mb-1 font-semibold">2. Ota tai lataa kuva:</label>
+            <div class="flex space-x-2 mb-2">
+              <button type="button" id="open-camera"
+                      class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Ota kamera
+              </button>
+              <label for="fileupload"
+                     class="flex-1 py-2 bg-indigo-600 text-white text-center rounded hover:bg-indigo-700 cursor-pointer">
+                Lataa tiedosto
+              </label>
+              <input type="file" id="fileupload" accept="image/*" class="hidden"/>
             </div>
-            <div>
-              <label class="block mb-1">7. Etunimi:</label>
-              <input type="text" name="etunimi" required
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-          </div>
-          <div>
-            <label class="block mb-1">8. Puhelinnumero:</label>
-            <input type="tel" name="puhelin" required placeholder="+358 44 123 1234"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">9. Sähköposti:</label>
-            <input type="email" name="sahkoposti" required
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">10. Rooli:</label>
-            <select name="rooli" required class="w-full border px-3 py-2 rounded">
-              <option>Työntekijä</option>
-              <option>Työnjohtaja</option>
-              <option>Vierailija</option>
-              <option>Harjoittelija</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-1">11. Jos olet harjoittelija, lisää koulun yhteyshenkilön nimi ja puhelinnumero:</label>
-            <input type="text" name="harjoittelija_yhteys"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">12. Kansalaisuus:</label>
-            <select name="kansalaisuus" required class="w-full border px-3 py-2 rounded">
-              <option>FOREIGN PERSONS – katso linkki</option>
-              <option>Suomi</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-1">13. Pääasiallinen työskentelyvaltio:</label>
-            <input type="text" name="tyoskentelyvaltio" required
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">14. Kieli:</label>
-            <input type="text" name="kieli" required
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block mb-1">15. Työturvallisuuskortti voimassa (kk/vuosi):</label>
-              <input type="month" name="tyoturvakortti_voimassa" required
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-            <div>
-              <label class="block mb-1">16. Työturvakortin numero:</label>
-              <input type="text" name="tyoturvakortti_numero" pattern="\d+"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block mb-1">17. Tulityökortti voimassa (kk/vuosi):</label>
-              <input type="month" name="tulityokortti_voimassa"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-            <div>
-              <label class="block mb-1">18. Tulityökortin numero:</label>
-              <input type="text" name="tulityokortti_numero" pattern="\d+"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
+            <div id="preview" class="border p-2 rounded min-h-[100px]"></div>
+            <input type="hidden" name="filename" id="filename">
+            <input type="hidden" name="file" id="file">
+            <input type="hidden" name="imageformat" id="imageformat">
           </div>
         </div>
       </fieldset>
 
-      <!-- Osa 2 -->
+      <!-- (Omat lomakekentät Osa 2–Osa 11 sisällytä tähän tarvittaessa, mutta ne eivät ole pakollisia aloituskoodiin) -->
+
+      <!-- Allekirjoitus -->
       <fieldset class="border p-4 rounded space-y-4">
-        <legend class="font-semibold text-lg">Osa 2 – Kohteen yleisesittely</legend>
-        <p>
-          <strong>Hankkeen nimi:</strong> Bss + SKiB Kampus<br/>
-          <strong>Työmaan osoite:</strong> Otavankatu 16, 28100 Pori<br/>
-          <strong>Työmaan käyntiosoite:</strong> Mikonkatu 15-17, 28100 Pori<br/>
-          <strong>Rakentamisaikataulu:</strong> 08/2023 – 12/2025<br/>
-          <strong>Tilaaja:</strong> Svenska Kulturfonden i Björneborg<br/>
-          <strong>Pääurakoitsija:</strong> MVR-Yhtymä Oy<br/>
-          <strong>Sivu-urakoitsijat:</strong><br/>
-             ‣ Purku-urakoitsija: Timantti-Nieminen Oy<br/>
-             ‣ Putkiurakoitsija: Vehmasputki Oy<br/>
-             ‣ SPR-urakoitsija: Paloff Sammutusjärjestelmät Oy<br/>
-             ‣ IV-urakoitsija: Ilmastointi Salminen Oy<br/>
-             ‣ AU Rakennusautomaatio: Trentec Oy<br/>
-             ‣ Sähköurakoitsija: Mekeltek Oy
-        </p>
-      </fieldset>
-
-      <!-- Osa 3 -->
-      <fieldset class="border p-4 rounded space-y-4">
-        <legend class="font-semibold text-lg">Osa 3 – Tietoa kohteesta</legend>
-        <p class="whitespace-pre-wrap text-sm text-gray-700">
-Bss + SKiB Kampus on Porin ruotsinkielisen yhtenäiskoulun (Bss) ja Svenska Kulturfonden i Björneborg-säätiön uudisrakennus- ja peruskorjaushanke. Rakennuskokonaisuuteen sijoittuvat Porin ruotsalaisen yhteiskoulun (Bss) ja Porin ruotsinkielisen kulttuurisäätiön (SKiB) koulu- ja kulttuurikampuksen tilat. Hanke käsittää Porin kaupungin III kaupunginosan (Malminpää) korttelin 36 tontin 3. Säilyvien osittain suojeltujen rakennusten kunnostamisen yhteydessä toteutetaan toiminnan edellyttämät muutokset ja rakennusten kunnon edellyttämät korjaukset. Toteutusmuoto on jaettu urakka.
-
-Tonteilta puretaan huonokuntoiseksi todettuja rakennuksia: nk. Palojoen kiinteistön rakennukset sekä käsityörakennukseksi kutsuttu Rosa Husetin piharakennus. Asemakaavassa kampuskokonaisuuden säilyvät rakennukset on merkitty suojeltaviksi sr-50-merkinnällä. Rakennuksissa toteutetaan rakennushankkeen yhteydessä tilamuutoksia sisältävä laaja peruskorjaus suojelumääräykset huomioiden. Korjattavat rakennukset ovat peräisin 1930- ja 1960-luvuilta.
-
-Uudisrakennus sijoittuu kahteen (2) maanpäälliseen kerrokseen. 2. kerroksen päälle sijoittuu kattopiha ja korkeampina massoina IV-konehuoneet sekä näihin liittyvät kattopihaa palvelevat porras- ja hissiyhteydet. Uudisrakennukseen sisältyy yksi (1) maanalainen kellarikerros, johon sijoitetaan väestönsuoja sekä varasto- ja teknisiä tiloja.
-
-Uudisrakennus liittyy säilyvään kokonaisuuteen uudelleenrakennettavan Bss Pihasiiven kautta. Pihasiiven rakentamisen yhteydessä koko liikuntasalin alapuolinen tila toteutetaan lämpimänä sisätilana.
-
-Osa hankkeeseen kuuluvista pyöräpaikoista sijoitetaan Liisantorin yleiselle urheilu- ja virkistyspalvelujen alueelle kaupungin kanssa erikseen tehdyn sopimuksen mukaisesti.
-        </p>
-      </fieldset>
-
-      <!-- Osa 4 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 4 – Työmaa-alue</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-KOHDE ON JAETTU 4 ERI OSAA. KÄYTETTÄVÄT LYHENTEET OVAT:
-
-UR = UUDISRAKENNUS  
-PS = PIHASIIPI  
-KS = KATUSIIPI  
-RH = ROSA HUSET
-        </p>
-      </fieldset>
-
-      <!-- Osa 5 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 5 – Työmaa-info</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-Työmaalle saavutaan Mikonkadun ja Otavankadun pyöröportista.  
-Työmaalle tullessa ja työmaalta lähtiessä leimataan joko pyöröportilla tai katusiiven 1. krs aulassa.
-
-Tarvittavat tavarat ja työkalut saa tuoda työmaa-alueelle. Autojen säilyttäminen työmaa-alueella on kielletty! MVR-Yhtymä ei ole vastuussa mahdollisista vaurioista autoille, jotka ovat työmaa-alueella luvatta / erikseen sovittu.
-
-Työmaa-alueella tallentava kameravalvonta ja hälytysjärjestelmä-/vartiointi  
-Normaalin työajan ulkopuolella työskentelystä tulee sopia MVR-Yhtymän edustajan kanssa!
-
-Työmaalla on käytössä rakennushissi. Jos et ole käyttänyt rakennushissiä aiemmin, niin pyydä käyttökoulut MVR-Yhtymältä!
-
-Työmaalla torninosturi! Koko työmaa-alueella tulee aina varoa mahdollisia nostoja, torninosturin nostot vain MVR-Yhtymän luvalla!
-
-Sosiaali- ja taukotilat sijaitsevat Katusiiven 1. kerroksessa.
-        </p>
-      </fieldset>
-
-      <!-- Osa 6 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 6 – Pelastautuminen ja ensiapu</legend>
-        <p class="text-sm text-gray-700">
-<strong>Yleinen hätänumero:</strong> 112  
-<strong>Kokoontumispaikka:</strong> Liisantori  
-<strong>Työmaan ensiapupisteet:</strong><br/>
-  – Taukotila<br/>
-  – Miesten sosiaalitila<br/>
-  – Katusiiven sisäänkäynti (ulkona, katoksen alla)<br/>
-  – Katusiiven kerrostasanteilla (rappukäytävä)
-        </p>
-      </fieldset>
-
-      <!-- Osa 7 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 7 – Työturvallisuus</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-VAATETUS JA HENKILÖKOHTAISET SUOJAIMET:  
-VÄHINTÄÄN YLÄOSAN OLTAVA NEONVÄRINEN, HEIJASTAVA  
-KUVALLINEN HENKILÖTUNNISTE NÄKYVILLÄ  
-KYPÄRÄ (CE/EN397)  
-Leukahihna  
-SUOJALASIT  
-KYPÄRÄÄN INTEGROIDUT SUOJALASIT EI KELPAA  
-TURVAKENGÄT NAULAANASTUMISSUOJALLA
-
-TARVITTAESSA:  
-– Kuulosuojaimet  
-– Hengityssuojaimet  
-– Turvavaljaat (käytetään aina, kun työskennellään aukkojen ja tasojen vapaille sivuille yli 2 m korkeudessa)  
-– Teleskooppipuominostureissa aina valjaat
-
-Voit tehdä työturvallisuushavainnon osoitteessa http://teehavainto.fi/  
-Tavoitteena tapaturmaton työmaa!
-        </p>
-      </fieldset>
-
-      <!-- Osa 8 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 8 – Työmaan erityispiirteet</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-Ympäröivä kaupunkialue: Lähialueiden asukkaat ja liiketilat huomioitava.  
-Koulun ja päiväkodin toiminta: Saattoliikenne, oppilaat ja opettajat huomioitava.  
-Ahdas työmaa-alue: Varastointipaikat sovittava MVR-Yhtymän kanssa.
-        </p>
-      </fieldset>
-
-      <!-- Osa 9 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 9 – Puhtauden- ja jätteidenhallinta</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-Uudisrakennustyömaalla P1-vaihe otetaan käyttöön runkovaiheen jälkeen.  
-Peruskorjattavissa rakennusosissa P1-puhtausluokkaa noudatetaan purkutöistä alkaen.
-
-Jäteastiat tulee olla kannellisia, avo-astioita ei sallita P1-vaiheessa.  
-Harjasiivous työmaalla kielletty → Kaikki siivoavat oman työkohteensa vähintään päivittäin lastapuhtaaksi!
-
-Jokainen urakoitsija vastaa jätteiden siivouksen, raivauksen, siirron ja lajittelun päivittäin jäteastioihin.  
-Urakoitsijat vastaavat omista puhtaudenhallintavälineistä (imurit ja kohdepoistot).
-        </p>
-      </fieldset>
-
-      <!-- Osa 10 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 10 – Kosteudenhallinta</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-Kosteudenhallinnan tavoitteena on estää kosteusvaurioiden syntymistä.  
-Jokaisen urakoitsijan tulee noudattaa suunnitelma-asiakirjoja ja hyvää rakennustapaa.  
-Muutosilmoitus ja varoitusjärjestely pääurakoitsijan kanssa pakollinen.
-        </p>
-      </fieldset>
-
-      <!-- Osa 11 -->
-      <fieldset class="border p-4 rounded">
-        <legend class="font-semibold text-lg">Osa 11 – Työmaan henkilöstö</legend>
-        <p class="text-sm text-gray-700 whitespace-pre-wrap">
-Veli-Matti Järvenpää 050 521 8333 – Vastaava työnjohtaja (MVR-Yhtymä Oy)  
-Kalle Uusitalo 044 401 3286 – Työmaainsinööri  
-Teemu Riita 040 072 2022 – Työnjohtaja Uudisrakennus ja pihasiipi  
-Ville Mattila 043 826 6944 – Työnjohtaja Uudisrakennus ja pihasiipi  
-Tommi Varjo 044 291 9292 – Työnjohtaja Katusiipi  
-        </p>
-      </fieldset>
-
-      <!-- Osa 12: kuva -->
-      <fieldset class="border p-4 rounded space-y-4">
-        <legend class="font-semibold text-lg">Osa 12 – Ota tai lataa kuva</legend>
-        <div class="flex space-x-2">
-          <button id="open-camera" type="button"
-                  class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Ota kamera
+        <legend class="font-semibold text-lg">Allekirjoitus</legend>
+        <p>Hyväksyn perehdytyksen:</p>
+        <div id="signature-pad" class="border rounded-lg relative">
+          <canvas id="signature-canvas" class="w-full h-48"></canvas>
+          <button type="button" id="clear-signature"
+                  class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded">
+            Tyhjennä
           </button>
-          <label for="fileupload"
-                 class="flex-1 py-2 bg-indigo-600 text-white text-center rounded hover:bg-indigo-700 cursor-pointer">
-            Lataa tiedosto
-          </label>
-          <input type="file" id="fileupload" accept="image/*" class="hidden"/>
         </div>
-        <div id="preview" class="mt-4"></div>
+        <input type="hidden" name="signature" id="signature">
+        <input type="hidden" name="signatureformat" id="signatureformat" value="png">
+        <input type="hidden" name="signaturefilename" id="signaturefilename">
       </fieldset>
 
     </form>
@@ -327,9 +95,10 @@ Tommi Varjo 044 291 9292 – Työnjohtaja Katusiipi
     </button>
 
     <div id="status" class="mt-6 text-center text-lg text-gray-800 hidden"></div>
+
     <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
 
-    <!-- Kamera overlay -->
+    <!-- Kamera Overlay -->
     <div id="camera-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
       <div class="relative w-[300px] h-[190px] rounded-xl overflow-hidden bg-black ring-4 ring-white">
         <video id="video" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
@@ -340,93 +109,111 @@ Tommi Varjo 044 291 9292 – Työnjohtaja Katusiipi
     </div>
   </div>
 
+  <!-- Signature Pad Library -->
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+
   <script>
+    // Kamera & tiedoston lataus
     const openBtn    = document.getElementById('open-camera');
     const fileupload = document.getElementById('fileupload');
     const overlay    = document.getElementById('camera-overlay');
     const video      = document.getElementById('video');
     const captureBtn = document.getElementById('capture-button');
     const preview    = document.getElementById('preview');
-    const form       = document.getElementById('send-form');
-    const sendBtn    = document.getElementById('send-button');
     const filenameI  = document.getElementById('filename');
     const fileI      = document.getElementById('file');
     const fmtI       = document.getElementById('imageformat');
+    const form       = document.getElementById('send-form');
+    const sendBtn    = document.getElementById('send-button');
     const statusDiv  = document.getElementById('status');
     const iframe     = document.getElementById('hidden_iframe');
-
     let stream, awaitingResponse = false;
 
-    // Avaa kamera
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
+        video:{ facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
       });
       video.srcObject = stream;
     });
-
-    // Ota kuva ja crop
     captureBtn.addEventListener('click', () => {
-      const vh = video.videoHeight, vw = video.videoWidth;
-      const aspect = 1.585, h = vh, w = Math.floor(h*aspect);
-      const sx = Math.floor((vw-w)/2), sy = 0;
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(video, sx, sy, w, h, 0, 0, w, h);
+      const vh=video.videoHeight, vw=video.videoWidth, aspect=1.585;
+      const h=vh, w=Math.floor(h*aspect), sx=Math.floor((vw-w)/2);
+      const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(video,sx,0,w,h,0,0,w,h);
       stream.getTracks().forEach(t=>t.stop());
       overlay.classList.add('hidden');
       handleDataURL(canvas.toDataURL('image/jpeg',0.8));
     });
-
-    // Tiedoston lataus
-    fileupload.addEventListener('change', () => {
-      const file = fileupload.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = evt => handleDataURL(evt.target.result);
-      reader.readAsDataURL(file);
+    fileupload.addEventListener('change', ()=>{
+      const f=fileupload.files[0]; if(!f) return;
+      const r=new FileReader(); r.onload=evt=>handleDataURL(evt.target.result); r.readAsDataURL(f);
     });
-
-    // Käsittele Base64 ja esikatselu
-    function handleDataURL(dataURL) {
-      preview.innerHTML = `<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
-      const [hdr,b64] = dataURL.split(',');
-      const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
-      const ext  = mime.split('/')[1].toLowerCase();
-      filenameI.value = `kuva_${Date.now()}.${ext}`;
-      fileI.value     = b64;
-      fmtI.value      = ext;
-      sendBtn.disabled = false;
-      sendBtn.classList.remove('opacity-50','cursor-not-allowed');
-      openBtn.classList.add('hidden');
+    function handleDataURL(dataURL){
+      preview.innerHTML=`<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
+      const [hdr,b64]=dataURL.split(','), mime=hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
+      const ext=mime.split('/')[1].toLowerCase();
+      filenameI.value=`kuva_${Date.now()}.${ext}`; fileI.value=b64; fmtI.value=ext;
+      // Allekirjoitus ei pakollinen, mutta aktivoidaan Lähetä vasta kun allekirjoitus valmis
+      checkFormReady();
     }
 
-    // Submit odotus
-    form.addEventListener('submit', () => {
+    // Signature Pad
+    const canvasEl = document.getElementById('signature-canvas');
+    const sigPadDiv = document.getElementById('signature-pad');
+    const sigPad = new SignaturePad(canvasEl, { backgroundColor:'rgba(255,255,255,0)' });
+    const clearBtn = document.getElementById('clear-signature');
+    const sigInput = document.getElementById('signature');
+    const sigName  = document.getElementById('signaturefilename');
+
+    function resizeCanvas(){
+      const ratio = Math.max(window.devicePixelRatio||1,1);
+      canvasEl.width = canvasEl.offsetWidth * ratio;
+      canvasEl.height = canvasEl.offsetHeight * ratio;
+      canvasEl.getContext('2d').scale(ratio,ratio);
+      sigPad.clear();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    clearBtn.addEventListener('click', ()=>{
+      sigPad.clear();
+      sigInput.value = '';
+      checkFormReady();
+    });
+
+    sigPad.onEnd = checkFormReady;
+
+    function checkFormReady(){
+      const ready = !sigPad.isEmpty();
+      if (ready){
+        const dataURL = sigPad.toDataURL('image/png');
+        sigInput.value = dataURL.split(',')[1];
+        sigName.value  = `signature_${Date.now()}.png`;
+      }
+      sendBtn.disabled = !ready;
+      sendBtn.classList.toggle('opacity-50', !ready);
+      sendBtn.classList.toggle('cursor-not-allowed', !ready);
+      sigPadDiv.classList.toggle('active', ready);
+    }
+
+    // Submit & postMessage
+    form.addEventListener('submit', ()=>{
       awaitingResponse = true;
       statusDiv.textContent = 'Lähetetään…';
       statusDiv.classList.remove('hidden','error');
     });
-
-    // postMessage-vastaus
-    window.addEventListener('message', event => {
+    window.addEventListener('message', event=>{
       if (!awaitingResponse) return;
       awaitingResponse = false;
       const res = event.data;
-      if (res.error) {
+      if (res.error){
         statusDiv.textContent = 'Virhe: '+res.error;
         statusDiv.classList.add('error');
       } else {
         statusDiv.textContent = 'Kiitos! Lomake lähetetty onnistuneesti.';
       }
-      setTimeout(()=>{
-        preview.innerHTML = '';
-        sendBtn.disabled  = true;
-        sendBtn.classList.add('opacity-50','cursor-not-allowed');
-        openBtn.classList.remove('hidden');
-        statusDiv.classList.add('hidden');
-      },5000);
+      setTimeout(()=>location.reload(),5000);
     });
   </script>
 </body>
