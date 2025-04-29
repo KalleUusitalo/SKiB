@@ -30,129 +30,41 @@
         <p>
           <strong>FOREIGN PERSONS:</strong> Complete the orientation from the attached link.<br/>
           <strong>Ulkomaalaiset henkilöt:</strong> Suorita perehdytys
-          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank"
-             class="text-blue-600 underline">tästä linkistä</a>.
+          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank" class="text-blue-600 underline">
+            tästä linkistä
+          </a>.
         </p>
-        <div class="grid grid-cols-1 gap-4">
+        <div class="space-y-4">
           <div>
             <label class="block mb-1">1. VALTTI-kortin numero (12 merkkiä):</label>
-            <input type="text" name="valttikortti" id="valttikortti"
-                   pattern="\d{12}"
+            <input type="text" name="valttikortti" pattern="\d{12}"
                    class="w-full border px-3 py-2 rounded"/>
-            <small class="text-gray-600">
-              Valttikortin numero on 12 merkki­nen numerosarja viivakoodin alapuolella.
-            </small>
-          </div>
-          <div>
-            <label class="block mb-1">2. Veronumero (jos korttia ei ole, 12 numeroa):</label>
-            <input type="text" name="veronumero" pattern="\d{12}"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">3. Yritys (palkan maksava):</label>
-            <input type="text" name="yritys"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">4. Tilaaja:</label>
-            <select name="tilaaja" class="w-full border px-3 py-2 rounded">
-              <option value="">— Valitse —</option>
-              <option>Svenska Kulturfonden i Björneborg</option>
-              <option>MVR-Yhtymä Oy</option>
-              <option>Ilmastointi Salminen Oy</option>
-              <option>Mekeltek Oy</option>
-              <option>Prepon Oy</option>
-              <option>Vehmasputki Oy</option>
-              <option>Timantti-Nieminen Oy</option>
-              <option>Paloff Sammutusjärjestelmät Oy</option>
-              <option>Trentec Oy</option>
-              <option>En tiedä</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-1">5. Syntymäaika (pp.kk.vvvv):</label>
-            <input type="date" name="syntymapaiva"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block mb-1">6. Sukunimi:</label>
-              <input type="text" name="sukunimi"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-            <div>
-              <label class="block mb-1">7. Etunimi:</label>
-              <input type="text" name="etunimi"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-          </div>
-          <div>
-            <label class="block mb-1">8. Puhelinnumero:</label>
-            <input type="tel" name="puhelin" placeholder="+358 44 123 1234"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">9. Sähköposti:</label>
-            <input type="email" name="sahkoposti"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">10. Rooli:</label>
-            <select name="rooli" class="w-full border px-3 py-2 rounded">
-              <option>Työntekijä</option>
-              <option>Työnjohtaja</option>
-              <option>Vierailija</option>
-              <option>Harjoittelija</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-1">11. Jos harjoittelija, koulun yhteyshenkilö:</label>
-            <input type="text" name="harjoittelija_yhteys"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">12. Kansalaisuus:</label>
-            <select name="kansalaisuus" class="w-full border px-3 py-2 rounded">
-              <option>Suomi</option>
-              <option>FOREIGN PERSONS – katso linkki</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-1">13. Pääasiallinen työskentelyvaltio:</label>
-            <input type="text" name="tyoskentelyvaltio"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div>
-            <label class="block mb-1">14. Kieli:</label>
-            <input type="text" name="kieli"
-                   class="w-full border px-3 py-2 rounded"/>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block mb-1">15. Työturvallisuuskortti voimassa (kk/vuosi):</label>
-              <input type="month" name="tyoturvakortti_voimassa"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-            <div>
-              <label class="block mb-1">16. Työturvallisuuskortin numero:</label>
-              <input type="text" name="tyoturvakortti_numero" pattern="\d+"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block mb-1">17. Tulityökortti voimassa (kk/vuosi):</label>
-              <input type="month" name="tulityokortti_voimassa"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
-            <div>
-              <label class="block mb-1">18. Tulityökortin numero:</label>
-              <input type="text" name="tulityokortti_numero" pattern="\d+"
-                     class="w-full border px-3 py-2 rounded"/>
-            </div>
+            <small class="text-gray-600">Valttikortin numero on 12 merkin numerosarja viivakoodin alapuolella.</small>
           </div>
         </div>
       </fieldset>
+
+      <!-- Osa 2: Ota tai lataa kuva heti VALTTI-kentän jälkeen -->
+      <fieldset class="border p-4 rounded space-y-4">
+        <legend class="font-semibold text-lg">Osa 2 – Ota tai lataa kuva</legend>
+        <div class="flex space-x-2 mb-4">
+          <button type="button" id="open-camera"
+                  class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Ota kamera
+          </button>
+          <label for="fileupload"
+                 class="flex-1 py-2 bg-indigo-600 text-white text-center rounded hover:bg-indigo-700 cursor-pointer">
+            Lataa tiedosto
+          </label>
+          <input type="file" id="fileupload" accept="image/*" class="hidden"/>
+        </div>
+        <div id="preview" class="border p-2 rounded min-h-[100px]"></div>
+        <input type="hidden" name="filename" id="filename"/>
+        <input type="hidden" name="file" id="file"/>
+        <input type="hidden" name="imageformat" id="imageformat"/>
+      </fieldset>
+
+      <!-- (Lisää tähän muut lomakekentät Osa 3–Osa 11 tarpeen mukaan) -->
 
       <!-- Allekirjoitus -->
       <fieldset class="border p-4 rounded space-y-4">
@@ -165,10 +77,11 @@
             Tyhjennä
           </button>
         </div>
-        <input type="hidden" name="signature" id="signature">
-        <input type="hidden" name="signatureformat" id="signatureformat" value="png">
-        <input type="hidden" name="signaturefilename" id="signaturefilename">
+        <input type="hidden" name="signature" id="signature"/>
+        <input type="hidden" name="signatureformat" id="signatureformat" value="png"/>
+        <input type="hidden" name="signaturefilename" id="signaturefilename"/>
       </fieldset>
+
     </form>
 
     <button id="send-button" form="send-form" type="submit" disabled
@@ -180,11 +93,13 @@
     <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
 
     <!-- Kamera overlay -->
-    <div id="camera-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+    <div id="camera-overlay"
+         class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
       <div class="relative w-[300px] h-[190px] rounded-xl overflow-hidden bg-black ring-4 ring-white">
         <video id="video" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
       </div>
-      <button id="capture-button" class="absolute bottom-20 bg-white text-black py-2 px-6 rounded-full shadow-lg">
+      <button id="capture-button"
+              class="absolute bottom-20 bg-white text-black py-2 px-6 rounded-full shadow-lg">
         Ota kuva
       </button>
     </div>
@@ -204,10 +119,7 @@
     const filenameI  = document.getElementById('filename');
     const fileI      = document.getElementById('file');
     const fmtI       = document.getElementById('imageformat');
-    const form       = document.getElementById('send-form');
-    const sendBtn    = document.getElementById('send-button');
-    const statusDiv  = document.getElementById('status');
-    let stream, awaitingResponse = false;
+    let stream;
 
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
@@ -217,80 +129,89 @@
       video.srcObject = stream;
     });
     captureBtn.addEventListener('click', () => {
-      const vh=video.videoHeight, vw=video.videoWidth, aspect=1.585;
-      const h=vh, w=Math.floor(h*aspect), sx=Math.floor((vw-w)/2);
-      const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(video,sx,0,w,h,0,0,w,h);
-      stream.getTracks().forEach(t=>t.stop());
+      const vh = video.videoHeight, vw = video.videoWidth, aspect = 1.585;
+      const h = vh, w = Math.floor(h * aspect), sx = Math.floor((vw - w) / 2);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(video, sx, 0, w, h, 0, 0, w, h);
+      stream.getTracks().forEach(t => t.stop());
       overlay.classList.add('hidden');
-      handleDataURL(canvas.toDataURL('image/jpeg',0.8));
+      handleDataURL(canvas.toDataURL('image/jpeg', 0.8));
     });
-    fileupload.addEventListener('change', ()=>{
-      const f=fileupload.files[0]; if(!f) return;
-      const r=new FileReader(); r.onload=evt=>handleDataURL(evt.target.result); r.readAsDataURL(f);
+    fileupload.addEventListener('change', () => {
+      const f = fileupload.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = evt => handleDataURL(evt.target.result);
+      r.readAsDataURL(f);
     });
-    function handleDataURL(dataURL){
-      preview.innerHTML=`<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
-      const [hdr,b64]=dataURL.split(','), mime=hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
-      const ext=mime.split('/')[1].toLowerCase();
-      filenameI.value=`kuva_${Date.now()}.${ext}`; fileI.value=b64; fmtI.value=ext;
+    function handleDataURL(dataURL) {
+      preview.innerHTML = `<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
+      const [hdr, b64] = dataURL.split(',');
+      const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
+      const ext = mime.split('/')[1].toLowerCase();
+      filenameI.value = `kuva_${Date.now()}.${ext}`;
+      fileI.value = b64;
+      fmtI.value = ext;
     }
 
     // Signature Pad
     const canvasEl = document.getElementById('signature-canvas');
-    const sigPadDiv = document.getElementById('signature-pad');
     const sigPad = new SignaturePad(canvasEl, { backgroundColor:'rgba(255,255,255,0)' });
     const clearBtn = document.getElementById('clear-signature');
     const sigInput = document.getElementById('signature');
     const sigName  = document.getElementById('signaturefilename');
+    const sendBtn  = document.getElementById('send-button');
+    const statusDiv= document.getElementById('status');
+    const form     = document.getElementById('send-form');
+    let awaitingResponse = false;
 
-    function resizeCanvas(){
+    function resizeCanvas() {
       const ratio = Math.max(window.devicePixelRatio||1,1);
       canvasEl.width = canvasEl.offsetWidth * ratio;
       canvasEl.height = canvasEl.offsetHeight * ratio;
-      canvasEl.getContext('2d').scale(ratio,ratio);
+      canvasEl.getContext('2d').scale(ratio, ratio);
       sigPad.clear();
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    clearBtn.addEventListener('click', ()=>{
+    clearBtn.addEventListener('click', () => {
       sigPad.clear();
       sigInput.value = '';
       checkFormReady();
     });
     sigPad.onEnd = checkFormReady;
 
-    function checkFormReady(){
+    function checkFormReady() {
       const ready = !sigPad.isEmpty();
-      if (ready){
+      if (ready) {
         const dataURL = sigPad.toDataURL('image/png');
         sigInput.value = dataURL.split(',')[1];
-        sigName.value  = `signature_${Date.now()}.png`;
+        sigName.value = `signature_${Date.now()}.png`;
       }
       sendBtn.disabled = !ready;
       sendBtn.classList.toggle('opacity-50', !ready);
       sendBtn.classList.toggle('cursor-not-allowed', !ready);
-      sigPadDiv.classList.toggle('active', ready);
+      document.getElementById('signature-pad').classList.toggle('active', ready);
     }
 
-    // Lähetä ja postMessage
-    form.addEventListener('submit', ()=>{
+    form.addEventListener('submit', () => {
       awaitingResponse = true;
       statusDiv.textContent = 'Lähetetään…';
       statusDiv.classList.remove('hidden','error');
     });
-    window.addEventListener('message', event=>{
+    window.addEventListener('message', event => {
       if (!awaitingResponse) return;
       awaitingResponse = false;
       const res = event.data;
-      if (res.error){
-        statusDiv.textContent = 'Virhe: '+res.error;
+      if (res.error) {
+        statusDiv.textContent = 'Virhe: ' + res.error;
         statusDiv.classList.add('error');
       } else {
         statusDiv.textContent = 'Kiitos! Lomake lähetetty onnistuneesti.';
       }
-      setTimeout(()=>location.reload(),5000);
+      setTimeout(() => location.reload(), 5000);
     });
   </script>
 </body>
