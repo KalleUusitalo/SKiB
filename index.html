@@ -4,7 +4,6 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Ota ja lähetä kuva</title>
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -12,13 +11,11 @@
 
     <h1 class="text-2xl font-semibold text-center mb-6">Ota ja lähetä kuva</h1>
 
-    <!-- 1) Avaa kamera -->
     <button id="open-camera"
             class="w-full mb-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
       Ota kuva
     </button>
 
-    <!-- 2) Lomake piilotetuille kentille ja Lähetä-painike -->
     <form id="send-form"
           action="https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec"
           method="post"
@@ -34,29 +31,19 @@
       </button>
     </form>
 
-    <!-- 3) Esikatselu otetusta kuvasta -->
     <div id="preview" class="mt-4"></div>
+    <div id="status" class="mt-6 text-center text-lg text-gray-800 hidden"></div>
 
-    <!-- 4) Status / lopetusviesti -->
-    <div id="status"
-         class="mt-6 text-center text-lg text-gray-800 hidden">
-    </div>
-
-    <!-- Piilotettu iframe lomakkeen välitykseen -->
     <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
 
-    <!-- 5) Kameran overlay -->
     <div id="camera-overlay"
          class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
-      <!-- Luottokortin muotoinen aukko -->
       <div class="relative w-[300px] h-[190px] rounded-xl overflow-hidden bg-black ring-4 ring-white">
         <video id="video"
                class="absolute inset-0 w-full h-full object-cover"
-               autoplay
-               playsinline>
+               autoplay playsinline>
         </video>
       </div>
-      <!-- Ota kuva -painike overlayssä -->
       <button id="capture-button"
               class="absolute bottom-20 bg-white text-black py-2 px-6 rounded-full shadow-lg hover:bg-gray-200 transition">
         Ota kuva
@@ -66,98 +53,91 @@
   </div>
 
   <script>
-    const openBtn   = document.getElementById('open-camera');
-    const overlay   = document.getElementById('camera-overlay');
-    const video     = document.getElementById('video');
-    const captureBtn= document.getElementById('capture-button');
-    const preview   = document.getElementById('preview');
-    const form      = document.getElementById('send-form');
-    const sendBtn   = document.getElementById('send-button');
-    const filenameI = document.getElementById('filename');
-    const fileI     = document.getElementById('file');
-    const fmtI      = document.getElementById('imageformat');
-    const statusDiv = document.getElementById('status');
-    const iframe    = document.getElementById('hidden_iframe');
+    const openBtn    = document.getElementById('open-camera');
+    const overlay    = document.getElementById('camera-overlay');
+    const video      = document.getElementById('video');
+    const captureBtn = document.getElementById('capture-button');
+    const preview    = document.getElementById('preview');
+    const form       = document.getElementById('send-form');
+    const sendBtn    = document.getElementById('send-button');
+    const filenameI  = document.getElementById('filename');
+    const fileI      = document.getElementById('file');
+    const fmtI       = document.getElementById('imageformat');
+    const statusDiv  = document.getElementById('status');
+    const iframe     = document.getElementById('hidden_iframe');
 
     let stream;
+    let awaitingResponse = false;
 
-    // 1) Avaa kamera
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
-      // pyydetään 4K-toteava media
       stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width : { ideal: 3840 },
-          height: { ideal: 2160 }
-        }
+        video: { facingMode: 'environment', width:{ideal:3840}, height:{ideal:2160} }
       });
       video.srcObject = stream;
     });
 
-    // 2) Capture & crop
     captureBtn.addEventListener('click', () => {
-      // luo canvas-croppi credit-card-aukosta
-      const aspect = 1.585; // credit-card ratio
-      const vh     = video.videoHeight;
-      const vw     = video.videoWidth;
-      // leikkaa leveydestä keskeltä
-      const h      = vh;
-      const w      = Math.floor(h * aspect);
-      const sx     = Math.floor((vw - w) / 2);
-      const sy     = 0;
-
+      const vh = video.videoHeight, vw = video.videoWidth;
+      const aspect = 1.585;
+      const h = vh, w = Math.floor(h * aspect);
+      const sx = Math.floor((vw - w) / 2), sy = 0;
       const canvas = document.createElement('canvas');
-      canvas.width  = w;
-      canvas.height = h;
+      canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, sx, sy, w, h, 0, 0, w, h);
-
-      // pysäytä kamera
       stream.getTracks().forEach(t => t.stop());
       overlay.classList.add('hidden');
 
-      // näytä esikatselu
       const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-      const img     = document.createElement('img');
-      img.src       = dataURL;
+      const img = document.createElement('img');
+      img.src = dataURL;
       img.className = 'rounded-lg shadow-md';
       preview.innerHTML = '';
       preview.appendChild(img);
 
-      // täytä lomaketiedot Base64-datalla
       const [hdr, base64] = dataURL.split(',');
       const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
-      const ext  = mime.split('/')[1].toLowerCase();
-      filenameI.value   = `kuva_${Date.now()}.${ext}`;
-      fileI.value       = base64;
-      fmtI.value        = ext;
+      const ext = mime.split('/')[1].toLowerCase();
+      filenameI.value = `kuva_${Date.now()}.${ext}`;
+      fileI.value     = base64;
+      fmtI.value      = ext;
 
-      // näytä Lähetä-painike
-      sendBtn.disabled   = false;
+      sendBtn.disabled = false;
       sendBtn.classList.remove('opacity-50','cursor-not-allowed');
       openBtn.classList.add('hidden');
     });
 
-    // 3) Kun back-end vastaa iframeen, näytä lopetusviesti
+    form.addEventListener('submit', () => {
+      awaitingResponse = true;
+      statusDiv.textContent = 'Lähetetään…';
+      statusDiv.classList.remove('hidden','error');
+    });
+
     iframe.addEventListener('load', () => {
+      if (!awaitingResponse) return;
+      awaitingResponse = false;
+
+      let doc;
       try {
-        const res = JSON.parse(iframe.contentDocument.body.textContent);
+        doc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!doc || !doc.body) throw new Error('Ei sisältöä.');
+        const text = doc.body.textContent.trim();
+        const res = JSON.parse(text);
         if (res.error) throw new Error(res.error);
 
-        statusDiv.textContent = 
+        statusDiv.textContent =
           'Tervetuloa turvalliselle työmaalle – ' +
           'Hae MVR:n toimistosta "Perehdytetty" tarra';
-      } catch (e) {
-        statusDiv.textContent = 'Virhe: '+ e.message;
+        statusDiv.classList.remove('error');
+      } catch (err) {
+        statusDiv.textContent = 'Virhe: ' + err.message;
+        statusDiv.classList.add('error');
       }
-      statusDiv.classList.remove('hidden');
 
-      // 4) Odota 5 sekuntia ja resetoidu
       setTimeout(() => {
-        // nollaa tila
-        preview.innerHTML   = '';
-        sendBtn.disabled    = true;
+        preview.innerHTML = '';
+        sendBtn.disabled = true;
         sendBtn.classList.add('opacity-50','cursor-not-allowed');
         openBtn.classList.remove('hidden');
         statusDiv.classList.add('hidden');
