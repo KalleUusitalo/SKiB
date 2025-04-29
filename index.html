@@ -66,8 +66,7 @@
     const statusDiv  = document.getElementById('status');
     const iframe     = document.getElementById('hidden_iframe');
 
-    let stream;
-    let awaitingResponse = false;
+    let stream, awaitingResponse = false;
 
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
@@ -114,25 +113,20 @@
       statusDiv.classList.remove('hidden','error');
     });
 
-    iframe.addEventListener('load', () => {
+    // Kuuntelee postMessage-viestit iframe-lapselta
+    window.addEventListener('message', event => {
+      // Voit halutessasi tarkistaa event.origin === 'https://script.google.com'
       if (!awaitingResponse) return;
       awaitingResponse = false;
 
-      let doc;
-      try {
-        doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body) throw new Error('Ei sisältöä.');
-        const text = doc.body.textContent.trim();
-        const res = JSON.parse(text);
-        if (res.error) throw new Error(res.error);
-
+      let res = event.data;
+      if (res.error) {
+        statusDiv.textContent = 'Virhe: ' + res.error;
+        statusDiv.classList.add('error');
+      } else {
         statusDiv.textContent =
           'Tervetuloa turvalliselle työmaalle – ' +
           'Hae MVR:n toimistosta "Perehdytetty" tarra';
-        statusDiv.classList.remove('error');
-      } catch (err) {
-        statusDiv.textContent = 'Virhe: ' + err.message;
-        statusDiv.classList.add('error');
       }
 
       setTimeout(() => {
