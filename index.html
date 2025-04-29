@@ -129,7 +129,7 @@
         openCameraBtn.classList.add('d-none');
       } catch (err) {
         console.error('Kameran avaaminen epäonnistui:', err);
-        responseDiv.textContent = 'Kameran avaaminen epäonnistui.';
+        responseDiv.textContent = 'Virhe kameran avaamisessa. Yritä hetken päästä uudelleen.';
       }
     });
 
@@ -179,7 +179,7 @@
         videoWrapper.style.display = 'block';
       } catch (err) {
         console.error('Kameran avaaminen epäonnistui:', err);
-        responseDiv.textContent = 'Kameran avaaminen epäonnistui.';
+        responseDiv.textContent = 'Virhe kameran avaamisessa. Yritä hetken päästä uudelleen.';
       }
     });
 
@@ -220,7 +220,7 @@
       })
       .catch(err => {
         console.error('Fetch error:', err);
-        responseDiv.textContent = 'Verkkovirhe. Yritä uudelleen.';
+        responseDiv.textContent = 'Verkkovirhe. Tarkista internet-yhteys ja yritä uudelleen.';
       });
     });
   </script>
