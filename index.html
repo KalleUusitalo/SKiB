@@ -20,7 +20,7 @@
       max-width: 400px;
       width: 100%;
     }
-    /* Kameran videokehys ja korttimuotoinen rajaus */
+    /* Kameran videokehys ja korttimuotoinen rajaus (ilman sisemmän reunan borderia) */
     .video-wrapper {
       position: relative;
       width: 100%;
@@ -28,6 +28,7 @@
       background: #000;
       overflow: hidden;
       border-radius: .5rem;
+      display: none;
     }
     .video-wrapper video {
       position: absolute;
@@ -38,11 +39,9 @@
     }
     #overlay {
       position: absolute;
-      /* Korttimuotoinen alue */
+      /* Korttimuotoinen alue videon päällä, ilman visiibilejä rajoja */
       top: 12%; left: 8%;
       width: 84%; height: 56%;
-      border: 2px dashed #fff;
-      border-radius: .5rem;
       pointer-events: none;
     }
     #captureCanvas {
@@ -58,23 +57,39 @@
     <form id="contactForm">
       <div class="mb-3">
         <label for="name" class="form-label">Nimi</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Etunimi Sukunimi" required>
+        <input type="text" class="form-control" id="name" name="name"
+               placeholder="Etunimi Sukunimi" required>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Sähköposti</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="sahkoposti@esimerkki.fi" required>
+        <input type="email" class="form-control" id="email" name="email"
+               placeholder="sahkoposti@esimerkki.fi" required>
       </div>
 
-      <!-- Kameraosio -->
+      <!-- Kamera-osio -->
       <div id="camera-container" class="mb-3 text-center">
-        <div class="video-wrapper mx-auto" id="videoWrapper">
+        <!-- Käynnistä kamera -->
+        <button type="button" id="openCameraBtn" class="btn btn-secondary">
+          Ota kuva kortista
+        </button>
+
+        <!-- Videoruudukko ja rajaus -->
+        <div class="video-wrapper mt-2" id="videoWrapper">
           <video id="video" autoplay playsinline></video>
           <div id="overlay"></div>
-          <canvas id="captureCanvas"></canvas>
         </div>
-        <div class="mt-2" id="camera-buttons">
-          <button type="button" id="captureBtn" class="btn btn-secondary">Ota kuva kortista</button>
-          <button type="button" id="retakeBtn" class="btn btn-secondary d-none">Ota uusi kuva</button>
+
+        <!-- Rajattu kuva -->
+        <canvas id="captureCanvas" class="mt-2"></canvas>
+
+        <!-- Näppäimet kuvaamiseen ja uudelleen ottoon -->
+        <div class="mt-2">
+          <button type="button" id="snapBtn" class="btn btn-secondary d-none">
+            Ota kuva
+          </button>
+          <button type="button" id="retakeBtn" class="btn btn-secondary d-none">
+            Ota uusi kuva
+          </button>
         </div>
       </div>
 
@@ -84,75 +99,91 @@
   </div>
 
   <script>
-    // KORVAA OMA WEB APP -URL:LLASI
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec';
+    // KORVAA OMA Google Apps Script -WEB APP -URL:LLASI
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxYOUR_WEB_APP_ID/exec';
 
-    const video    = document.getElementById('video');
-    const overlay  = document.getElementById('overlay');
-    const canvas   = document.getElementById('captureCanvas');
-    const captureBtn = document.getElementById('captureBtn');
-    const retakeBtn  = document.getElementById('retakeBtn');
-    const form     = document.getElementById('contactForm');
-    const responseDiv = document.getElementById('response');
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const videoWrapper   = document.getElementById('videoWrapper');
+    const video          = document.getElementById('video');
+    const overlay        = document.getElementById('overlay');
+    const snapBtn        = document.getElementById('snapBtn');
+    const retakeBtn      = document.getElementById('retakeBtn');
+    const canvas         = document.getElementById('captureCanvas');
+    const form           = document.getElementById('contactForm');
+    const responseDiv    = document.getElementById('response');
 
-    let croppedCanvas = null;
+    let stream = null;
 
-    // Käyttäjän kameran avaaminen
-    navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false
-    })
-    .then(stream => {
-      video.srcObject = stream;
-    })
-    .catch(err => {
-      console.error('Kameran avaaminen epäonnistui:', err);
-      captureBtn.disabled = true;
+    // 1) Avaa kamera vasta napista
+    openCameraBtn.addEventListener('click', async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+        video.srcObject = stream;
+        video.play();
+
+        videoWrapper.style.display = 'block';
+        snapBtn.classList.remove('d-none');
+        openCameraBtn.classList.add('d-none');
+      } catch (err) {
+        console.error('Kameran avaaminen epäonnistui:', err);
+        responseDiv.textContent = 'Kameran avaaminen epäonnistui.';
+      }
     });
 
-    // "Ota kuva" -toiminto
-    captureBtn.addEventListener('click', () => {
-      // Lasketaan rajausalue videon koordinaatistossa
-      const videoRect   = video.getBoundingClientRect();
-      const overlayRect = overlay.getBoundingClientRect();
-      const scaleX = video.videoWidth  / videoRect.width;
-      const scaleY = video.videoHeight / videoRect.height;
-      const sx = (overlayRect.left - videoRect.left) * scaleX;
-      const sy = (overlayRect.top  - videoRect.top)  * scaleY;
-      const sWidth  = overlayRect.width  * scaleX;
-      const sHeight = overlayRect.height * scaleY;
+    // 2) Ota kuva rajauksella
+    snapBtn.addEventListener('click', () => {
+      const vRect = video.getBoundingClientRect();
+      const oRect = overlay.getBoundingClientRect();
+      const scaleX = video.videoWidth  / vRect.width;
+      const scaleY = video.videoHeight / vRect.height;
+      const sx      = (oRect.left - vRect.left) * scaleX;
+      const sy      = (oRect.top  - vRect.top)  * scaleY;
+      const sw      = oRect.width  * scaleX;
+      const sh      = oRect.height * scaleY;
 
-      // Luodaan uusi canvas rajatulle kuvalle
-      croppedCanvas = document.createElement('canvas');
-      croppedCanvas.width  = sWidth;
-      croppedCanvas.height = sHeight;
-      const ctx = croppedCanvas.getContext('2d');
-      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+      // Piirrä rajattu kuva väliaikaiseen canvas-elementtiin
+      const tmp = document.createElement('canvas');
+      tmp.width  = sw;
+      tmp.height = sh;
+      tmp.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
 
-      // Näytetään rajattu kuva pääsivun canvas-elementissä
-      canvas.width  = sWidth;
-      canvas.height = sHeight;
+      // Näytä käyttäjälle
+      canvas.width  = sw;
+      canvas.height = sh;
       canvas.style.display = 'block';
-      canvas.getContext('2d').drawImage(croppedCanvas, 0, 0);
+      canvas.getContext('2d').drawImage(tmp, 0, 0);
 
-      // Piilotetaan video ja vaihdetaan napit
-      video.style.display = 'none';
-      overlay.style.display = 'none';
-      captureBtn.classList.add('d-none');
+      // Sammuta kamera
+      stream.getTracks().forEach(t => t.stop());
+      videoWrapper.style.display = 'none';
+      snapBtn.classList.add('d-none');
       retakeBtn.classList.remove('d-none');
     });
 
-    // "Ota uusi kuva" -toiminto
-    retakeBtn.addEventListener('click', () => {
-      croppedCanvas = null;
+    // 3) Ota uusi kuva jos tarvii
+    retakeBtn.addEventListener('click', async () => {
       canvas.style.display = 'none';
-      video.style.display = 'block';
-      overlay.style.display = 'block';
-      captureBtn.classList.remove('d-none');
       retakeBtn.classList.add('d-none');
+      snapBtn.classList.remove('d-none');
+      // käynnistä kamera uudelleen
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+        video.srcObject = stream;
+        video.play();
+        videoWrapper.style.display = 'block';
+      } catch (err) {
+        console.error('Kameran avaaminen epäonnistui:', err);
+        responseDiv.textContent = 'Kameran avaaminen epäonnistui.';
+      }
     });
 
-    // Lomakkeen lähetys
+    // 4) Lähetä lomake
     form.addEventListener('submit', e => {
       e.preventDefault();
       const nameVal  = form.name.value.trim();
@@ -161,39 +192,36 @@
 
       responseDiv.textContent = 'Lähetetään…';
 
-      const sendForm = fd => {
-        fetch(scriptURL, { method: 'POST', body: fd })
-          .then(r => r.json())
-          .then(json => {
-            if (json.result === 'success') {
-              responseDiv.textContent = 'Kiitos! Lomakkeesi on lähetetty.';
-              form.reset();
-              retakeBtn.click();  // palautetaan kamera
-            } else {
-              console.error('Palvelimen virhe:', json.error);
-              responseDiv.textContent = 'Virhe lähetyksessä. Yritä hetken päästä uudelleen.';
-            }
-          })
-          .catch(err => {
-            console.error('Fetch error:', err);
-            responseDiv.textContent = 'Virhe lähetyksessä. Yritä hetken päästä uudelleen.';
-          });
-      };
-
-      // Kootaan FormData
-      const fd = new FormData();
-      fd.append('name',  nameVal);
-      fd.append('email', emailVal);
-
-      if (croppedCanvas) {
-        // Muodostetaan PNG-blob ja liitetään
-        croppedCanvas.toBlob(blob => {
-          fd.append('image', blob, nameVal + '_kortti.png');
-          sendForm(fd);
-        }, 'image/png');
-      } else {
-        sendForm(fd);
+      // Rakenna JSON-payload
+      const payload = { name: nameVal, email: emailVal };
+      if (canvas.style.display === 'block') {
+        const dataUrl = canvas.toDataURL('image/png');
+        payload.image    = dataUrl.split(',')[1];              // base64-data
+        payload.filename = nameVal + '_kortti.png';
       }
+
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(json => {
+        if (json.result === 'success') {
+          responseDiv.textContent = 'Kiitos! Lomakkeesi on lähetetty.';
+          form.reset();
+          canvas.style.display = 'none';
+          retakeBtn.classList.add('d-none');
+          openCameraBtn.classList.remove('d-none');
+        } else {
+          console.error('Palvelimen virhe:', json.error);
+          responseDiv.textContent = 'Virhe lähetyksessä. Yritä uudelleen.';
+        }
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+        responseDiv.textContent = 'Verkkovirhe. Yritä uudelleen.';
+      });
     });
   </script>
 </body>
