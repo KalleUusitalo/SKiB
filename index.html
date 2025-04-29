@@ -1,117 +1,167 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Ota ja lähetä kuva</title>
-  <style>
-    body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background:#f8f9fa;
-           display:flex; align-items:center; justify-content:center; min-height:100vh; }
-    .container { background:#fff; padding:2rem; border-radius:.75rem;
-                 box-shadow:0 4px 16px rgba(0,0,0,0.05); max-width:420px; width:90%; }
-    h1 { margin:0 0 1.5rem; font-size:1.75rem; text-align:center; color:#333; }
-    .input-group { margin-bottom:1.25rem; }
-    label { display:block; margin-bottom:.5rem; color:#555; font-size:.9rem; }
-    input[type="file"] { width:100%; padding:.5rem; border:1px solid #ced4da;
-                         border-radius:.375rem; cursor:pointer; }
-    #preview img { display:block; max-width:100%; margin-top:1rem; border-radius:.375rem; }
-    button { width:100%; padding:.75rem; font-size:1rem; font-weight:500; color:#fff;
-             background:linear-gradient(135deg,#0069d9,#0053ba); border:none;
-             border-radius:.5rem; cursor:pointer; transition:background .2s,transform .1s; }
-    button:hover { background:linear-gradient(135deg,#0053ba,#0041a8); transform:translateY(-1px); }
-    button:active { transform:translateY(0); }
-    #status { margin-top:1rem; text-align:center; font-size:.95rem; color:#28a745; }
-    #status.error { color:#dc3545; }
-  </style>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>Ota ja lähetä kuva</h1>
-    <form id="photo-form"
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative">
+
+    <h1 class="text-2xl font-semibold text-center mb-6">Ota ja lähetä kuva</h1>
+
+    <!-- 1) Avaa kamera -->
+    <button id="open-camera"
+            class="w-full mb-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      Ota kuva
+    </button>
+
+    <!-- 2) Lomake piilotetuille kentille ja Lähetä-painike -->
+    <form id="send-form"
           action="https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec"
           method="post"
           target="hidden_iframe">
-      <div class="input-group">
-        <label for="photo">Valitse tiedosto tai ota kuva:</label>
-        <input type="file"
-               id="photo"
-               name="unused"
-               accept="image/*"
-               capture="environment"
-               required>
-      </div>
-      <!-- Piilotetut kentät Base64-datalle -->
-      <input type="hidden" name="filename"     id="filename">
-      <input type="hidden" name="file"         id="file">
-      <input type="hidden" name="imageformat"  id="imageformat">
-      <div id="preview"></div>
-      <button type="submit">Lähetä</button>
+      <input type="hidden" name="filename"    id="filename">
+      <input type="hidden" name="file"        id="file">
+      <input type="hidden" name="imageformat" id="imageformat">
+      <button id="send-button"
+              type="submit"
+              disabled
+              class="w-full py-3 bg-green-600 text-white rounded-lg opacity-50 cursor-not-allowed">
+        Lähetä
+      </button>
     </form>
 
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-    <div id="status"></div>
+    <!-- 3) Esikatselu otetusta kuvasta -->
+    <div id="preview" class="mt-4"></div>
+
+    <!-- 4) Status / lopetusviesti -->
+    <div id="status"
+         class="mt-6 text-center text-lg text-gray-800 hidden">
+    </div>
+
+    <!-- Piilotettu iframe lomakkeen välitykseen -->
+    <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
+
+    <!-- 5) Kameran overlay -->
+    <div id="camera-overlay"
+         class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+      <!-- Luottokortin muotoinen aukko -->
+      <div class="relative w-[300px] h-[190px] rounded-xl overflow-hidden bg-black ring-4 ring-white">
+        <video id="video"
+               class="absolute inset-0 w-full h-full object-cover"
+               autoplay
+               playsinline>
+        </video>
+      </div>
+      <!-- Ota kuva -painike overlayssä -->
+      <button id="capture-button"
+              class="absolute bottom-20 bg-white text-black py-2 px-6 rounded-full shadow-lg hover:bg-gray-200 transition">
+        Ota kuva
+      </button>
+    </div>
+
   </div>
 
   <script>
-    const form    = document.getElementById('photo-form');
-    const input   = document.getElementById('photo');
-    const preview = document.getElementById('preview');
-    const status  = document.getElementById('status');
-    const iframe  = document.getElementById('hidden_iframe');
+    const openBtn   = document.getElementById('open-camera');
+    const overlay   = document.getElementById('camera-overlay');
+    const video     = document.getElementById('video');
+    const captureBtn= document.getElementById('capture-button');
+    const preview   = document.getElementById('preview');
+    const form      = document.getElementById('send-form');
+    const sendBtn   = document.getElementById('send-button');
+    const filenameI = document.getElementById('filename');
+    const fileI     = document.getElementById('file');
+    const fmtI      = document.getElementById('imageformat');
+    const statusDiv = document.getElementById('status');
+    const iframe    = document.getElementById('hidden_iframe');
 
-    // Esikatselu
-    input.addEventListener('change', () => {
-      preview.innerHTML = '';
-      const file = input.files[0];
-      if (!file) return;
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      preview.appendChild(img);
-    });
+    let stream;
 
-    // Käsittele Base64 ja lähetä
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const fileObj = input.files[0];
-      if (!fileObj) {
-        status.textContent = 'Valitse ensin kuva.';
-        status.classList.add('error');
-        return;
-      }
-      status.textContent = 'Käsitellään…';
-      status.classList.remove('error');
-      const reader = new FileReader();
-      reader.onload = evt => {
-        const [meta, base64] = evt.target.result.split(',');
-        const mime = meta.match(/data:(image\/[a-zA-Z]+);base64/)[1];
-        const ext  = mime.split('/')[1].toLowerCase();
-        document.getElementById('filename').value    = fileObj.name;
-        document.getElementById('file').value        = base64;
-        document.getElementById('imageformat').value = ext;
-        form.submit();  // piilotettuun iframeen
-        status.textContent = 'Lähetetään…';
-      };
-      reader.readAsDataURL(fileObj);
-    });
-
-    // Kun iframe on latautunut, luetaan JSON-vastaus
-    iframe.addEventListener('load', () => {
-      let doc  = iframe.contentDocument || iframe.contentWindow.document;
-      let text = doc.body.textContent;
-      try {
-        const res = JSON.parse(text);
-        if (res.error) {
-          status.textContent = 'Virhe: ' + res.error;
-          status.classList.add('error');
-        } else {
-          status.innerHTML = 'Kiitos! '
-            + 'Kuva tallennettu <a href="' + res.url + '" target="_blank">Drivessa</a>.';
-          status.classList.remove('error');
+    // 1) Avaa kamera
+    openBtn.addEventListener('click', async () => {
+      overlay.classList.remove('hidden');
+      // pyydetään 4K-toteava media
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width : { ideal: 3840 },
+          height: { ideal: 2160 }
         }
-      } catch (err) {
-        status.textContent = 'Vastaanotto epäonnistui.';
-        status.classList.add('error');
+      });
+      video.srcObject = stream;
+    });
+
+    // 2) Capture & crop
+    captureBtn.addEventListener('click', () => {
+      // luo canvas-croppi credit-card-aukosta
+      const aspect = 1.585; // credit-card ratio
+      const vh     = video.videoHeight;
+      const vw     = video.videoWidth;
+      // leikkaa leveydestä keskeltä
+      const h      = vh;
+      const w      = Math.floor(h * aspect);
+      const sx     = Math.floor((vw - w) / 2);
+      const sy     = 0;
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, sx, sy, w, h, 0, 0, w, h);
+
+      // pysäytä kamera
+      stream.getTracks().forEach(t => t.stop());
+      overlay.classList.add('hidden');
+
+      // näytä esikatselu
+      const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+      const img     = document.createElement('img');
+      img.src       = dataURL;
+      img.className = 'rounded-lg shadow-md';
+      preview.innerHTML = '';
+      preview.appendChild(img);
+
+      // täytä lomaketiedot Base64-datalla
+      const [hdr, base64] = dataURL.split(',');
+      const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
+      const ext  = mime.split('/')[1].toLowerCase();
+      filenameI.value   = `kuva_${Date.now()}.${ext}`;
+      fileI.value       = base64;
+      fmtI.value        = ext;
+
+      // näytä Lähetä-painike
+      sendBtn.disabled   = false;
+      sendBtn.classList.remove('opacity-50','cursor-not-allowed');
+      openBtn.classList.add('hidden');
+    });
+
+    // 3) Kun back-end vastaa iframeen, näytä lopetusviesti
+    iframe.addEventListener('load', () => {
+      try {
+        const res = JSON.parse(iframe.contentDocument.body.textContent);
+        if (res.error) throw new Error(res.error);
+
+        statusDiv.textContent = 
+          'Tervetuloa turvalliselle työmaalle – ' +
+          'Hae MVR:n toimistosta "Perehdytetty" tarra';
+      } catch (e) {
+        statusDiv.textContent = 'Virhe: '+ e.message;
       }
+      statusDiv.classList.remove('hidden');
+
+      // 4) Odota 5 sekuntia ja resetoidu
+      setTimeout(() => {
+        // nollaa tila
+        preview.innerHTML   = '';
+        sendBtn.disabled    = true;
+        sendBtn.classList.add('opacity-50','cursor-not-allowed');
+        openBtn.classList.remove('hidden');
+        statusDiv.classList.add('hidden');
+      }, 5000);
     });
   </script>
 </body>
