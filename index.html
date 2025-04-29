@@ -27,49 +27,132 @@
       <!-- Osa 1 -->
       <fieldset class="border p-4 rounded space-y-4">
         <legend class="font-semibold text-lg">Osa 1</legend>
-
         <p>
           <strong>FOREIGN PERSONS:</strong> Complete the orientation from the attached link.<br/>
           <strong>Ulkomaalaiset henkilöt:</strong> Suorita perehdytys
-          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank" class="text-blue-600 underline">
-            tästä linkistä
-          </a>.
+          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank"
+             class="text-blue-600 underline">tästä linkistä</a>.
         </p>
-
         <div class="grid grid-cols-1 gap-4">
           <div>
-            <label class="block mb-1">1. Syötä VALTTI-kortin numero (12 merkkiä):</label>
+            <label class="block mb-1">1. VALTTI-kortin numero (12 merkkiä):</label>
             <input type="text" name="valttikortti" id="valttikortti"
-                   pattern="\d{12}" required
+                   pattern="\d{12}"
                    class="w-full border px-3 py-2 rounded"/>
             <small class="text-gray-600">
-              Valttikortin numero on 12-merkki­nen numerosarja viivakoodin alapuolella.
+              Valttikortin numero on 12 merkki­nen numerosarja viivakoodin alapuolella.
             </small>
           </div>
-
-          <!-- Kuvaosio Osa 1 jälkeen -->
           <div>
-            <label class="block mb-1 font-semibold">2. Ota tai lataa kuva:</label>
-            <div class="flex space-x-2 mb-2">
-              <button type="button" id="open-camera"
-                      class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Ota kamera
-              </button>
-              <label for="fileupload"
-                     class="flex-1 py-2 bg-indigo-600 text-white text-center rounded hover:bg-indigo-700 cursor-pointer">
-                Lataa tiedosto
-              </label>
-              <input type="file" id="fileupload" accept="image/*" class="hidden"/>
+            <label class="block mb-1">2. Veronumero (jos korttia ei ole, 12 numeroa):</label>
+            <input type="text" name="veronumero" pattern="\d{12}"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div>
+            <label class="block mb-1">3. Yritys (palkan maksava):</label>
+            <input type="text" name="yritys"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div>
+            <label class="block mb-1">4. Tilaaja:</label>
+            <select name="tilaaja" class="w-full border px-3 py-2 rounded">
+              <option value="">— Valitse —</option>
+              <option>Svenska Kulturfonden i Björneborg</option>
+              <option>MVR-Yhtymä Oy</option>
+              <option>Ilmastointi Salminen Oy</option>
+              <option>Mekeltek Oy</option>
+              <option>Prepon Oy</option>
+              <option>Vehmasputki Oy</option>
+              <option>Timantti-Nieminen Oy</option>
+              <option>Paloff Sammutusjärjestelmät Oy</option>
+              <option>Trentec Oy</option>
+              <option>En tiedä</option>
+            </select>
+          </div>
+          <div>
+            <label class="block mb-1">5. Syntymäaika (pp.kk.vvvv):</label>
+            <input type="date" name="syntymapaiva"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-1">6. Sukunimi:</label>
+              <input type="text" name="sukunimi"
+                     class="w-full border px-3 py-2 rounded"/>
             </div>
-            <div id="preview" class="border p-2 rounded min-h-[100px]"></div>
-            <input type="hidden" name="filename" id="filename">
-            <input type="hidden" name="file" id="file">
-            <input type="hidden" name="imageformat" id="imageformat">
+            <div>
+              <label class="block mb-1">7. Etunimi:</label>
+              <input type="text" name="etunimi"
+                     class="w-full border px-3 py-2 rounded"/>
+            </div>
+          </div>
+          <div>
+            <label class="block mb-1">8. Puhelinnumero:</label>
+            <input type="tel" name="puhelin" placeholder="+358 44 123 1234"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div>
+            <label class="block mb-1">9. Sähköposti:</label>
+            <input type="email" name="sahkoposti"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div>
+            <label class="block mb-1">10. Rooli:</label>
+            <select name="rooli" class="w-full border px-3 py-2 rounded">
+              <option>Työntekijä</option>
+              <option>Työnjohtaja</option>
+              <option>Vierailija</option>
+              <option>Harjoittelija</option>
+            </select>
+          </div>
+          <div>
+            <label class="block mb-1">11. Jos harjoittelija, koulun yhteyshenkilö:</label>
+            <input type="text" name="harjoittelija_yhteys"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div>
+            <label class="block mb-1">12. Kansalaisuus:</label>
+            <select name="kansalaisuus" class="w-full border px-3 py-2 rounded">
+              <option>Suomi</option>
+              <option>FOREIGN PERSONS – katso linkki</option>
+            </select>
+          </div>
+          <div>
+            <label class="block mb-1">13. Pääasiallinen työskentelyvaltio:</label>
+            <input type="text" name="tyoskentelyvaltio"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div>
+            <label class="block mb-1">14. Kieli:</label>
+            <input type="text" name="kieli"
+                   class="w-full border px-3 py-2 rounded"/>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-1">15. Työturvallisuuskortti voimassa (kk/vuosi):</label>
+              <input type="month" name="tyoturvakortti_voimassa"
+                     class="w-full border px-3 py-2 rounded"/>
+            </div>
+            <div>
+              <label class="block mb-1">16. Työturvallisuuskortin numero:</label>
+              <input type="text" name="tyoturvakortti_numero" pattern="\d+"
+                     class="w-full border px-3 py-2 rounded"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-1">17. Tulityökortti voimassa (kk/vuosi):</label>
+              <input type="month" name="tulityokortti_voimassa"
+                     class="w-full border px-3 py-2 rounded"/>
+            </div>
+            <div>
+              <label class="block mb-1">18. Tulityökortin numero:</label>
+              <input type="text" name="tulityokortti_numero" pattern="\d+"
+                     class="w-full border px-3 py-2 rounded"/>
+            </div>
           </div>
         </div>
       </fieldset>
-
-      <!-- (Omat lomakekentät Osa 2–Osa 11 sisällytä tähän tarvittaessa, mutta ne eivät ole pakollisia aloituskoodiin) -->
 
       <!-- Allekirjoitus -->
       <fieldset class="border p-4 rounded space-y-4">
@@ -86,7 +169,6 @@
         <input type="hidden" name="signatureformat" id="signatureformat" value="png">
         <input type="hidden" name="signaturefilename" id="signaturefilename">
       </fieldset>
-
     </form>
 
     <button id="send-button" form="send-form" type="submit" disabled
@@ -95,10 +177,9 @@
     </button>
 
     <div id="status" class="mt-6 text-center text-lg text-gray-800 hidden"></div>
-
     <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
 
-    <!-- Kamera Overlay -->
+    <!-- Kamera overlay -->
     <div id="camera-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
       <div class="relative w-[300px] h-[190px] rounded-xl overflow-hidden bg-black ring-4 ring-white">
         <video id="video" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
@@ -113,7 +194,7 @@
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 
   <script>
-    // Kamera & tiedoston lataus
+    // Kamera ja tiedoston lataus
     const openBtn    = document.getElementById('open-camera');
     const fileupload = document.getElementById('fileupload');
     const overlay    = document.getElementById('camera-overlay');
@@ -126,13 +207,12 @@
     const form       = document.getElementById('send-form');
     const sendBtn    = document.getElementById('send-button');
     const statusDiv  = document.getElementById('status');
-    const iframe     = document.getElementById('hidden_iframe');
     let stream, awaitingResponse = false;
 
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
       stream = await navigator.mediaDevices.getUserMedia({
-        video:{ facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
+        video: { facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
       });
       video.srcObject = stream;
     });
@@ -154,8 +234,6 @@
       const [hdr,b64]=dataURL.split(','), mime=hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
       const ext=mime.split('/')[1].toLowerCase();
       filenameI.value=`kuva_${Date.now()}.${ext}`; fileI.value=b64; fmtI.value=ext;
-      // Allekirjoitus ei pakollinen, mutta aktivoidaan Lähetä vasta kun allekirjoitus valmis
-      checkFormReady();
     }
 
     // Signature Pad
@@ -181,7 +259,6 @@
       sigInput.value = '';
       checkFormReady();
     });
-
     sigPad.onEnd = checkFormReady;
 
     function checkFormReady(){
@@ -197,7 +274,7 @@
       sigPadDiv.classList.toggle('active', ready);
     }
 
-    // Submit & postMessage
+    // Lähetä ja postMessage
     form.addEventListener('submit', ()=>{
       awaitingResponse = true;
       statusDiv.textContent = 'Lähetetään…';
