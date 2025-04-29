@@ -1,59 +1,48 @@
 <!DOCTYPE html>
-<html lang="fi" class="scroll-smooth">
+<html lang="fi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ota kuva ja lähetä</title>
-  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'media',
-      theme: {
-        extend: { colors: { primary: '#3b82f6' } },
-      },
-    };
-  </script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen p-4">
   <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-    <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Ota kuva ja lähetä</h1>
+    <h1 class="text-2xl font-bold mb-6 text-center">Ota tiedosto ja lähetä</h1>
     <form id="myForm" action="https://script.google.com/macros/s/AKfycbw3zw9bz-2s4NpjY6xD28K9Z62E4FHie3WBhJpafHcutkocKlILj4a1SYURGt8onBJl0w/exec" method="post" class="space-y-4">
       <div>
-        <label for="name" class="block text-sm font-medium mb-1">Nimi</label>
-        <input id="name" name="name" type="text" required placeholder="Nimesi"
-               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 dark:bg-gray-700"/>
+        <label for="name" class="block text-sm font-medium">Nimi</label>
+        <input id="name" name="name" type="text" required
+               class="w-full px-4 py-2 border rounded-lg" placeholder="Nimesi">
       </div>
       <div>
-        <label for="email" class="block text-sm font-medium mb-1">Sähköposti</label>
-        <input id="email" name="email" type="email" required placeholder="Sähköpostisi"
-               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 dark:bg-gray-700"/>
+        <label for="email" class="block text-sm font-medium">Sähköposti</label>
+        <input id="email" name="email" type="email" required
+               class="w-full px-4 py-2 border rounded-lg" placeholder="Sähköpostisi">
       </div>
       <div>
-        <label for="fileInput" class="block text-sm font-medium mb-1">Valitse tiedosto</label>
-        <input type="file" id="fileInput" name="file" accept="image/*,application/pdf,.doc,.docx"
-               class="block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-700"
-               required/>
+        <label for="fileInput" class="block text-sm font-medium">Valitse tiedosto</label>
+        <input type="file" id="fileInput" name="file" required
+               accept="image/*,application/pdf,.doc,.docx"
+               class="w-full text-sm">
       </div>
-      <!-- Piilotetut kentät Base64-enkoodatulle tiedostolle -->
+      <!-- Piilotetut kentät Base64-tiedolle -->
       <input type="hidden" name="image" id="imageData">
       <input type="hidden" name="filename" id="fileName">
       <input type="hidden" name="mimetype" id="mimeType">
       <button type="submit"
-              class="w-full py-3 bg-primary hover:bg-blue-700 rounded-lg text-white font-semibold transition duration-200">
-        Lähetä
-      </button>
+              class="w-full py-2 bg-blue-600 text-white rounded-lg">Lähetä</button>
       <p id="status" class="text-center text-sm mt-2"></p>
     </form>
   </div>
 
   <script>
-    const form        = document.getElementById('myForm');
-    const fileInput   = document.getElementById('fileInput');
-    const imageData   = document.getElementById('imageData');
-    const fileName    = document.getElementById('fileName');
-    const mimeType    = document.getElementById('mimeType');
-    const status      = document.getElementById('status');
+    const form      = document.getElementById('myForm');
+    const fileInput = document.getElementById('fileInput');
+    const imageData = document.getElementById('imageData');
+    const fileName  = document.getElementById('fileName');
+    const mimeType  = document.getElementById('mimeType');
+    const status    = document.getElementById('status');
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -61,44 +50,41 @@
 
       const file = fileInput.files[0];
       if (!file) {
-        alert("Valitse tiedosto ensin!");
+        status.textContent = 'Valitse tiedosto!';
+        status.classList.add('text-red-500');
         return;
       }
 
-      try {
-        // Tallenna meta­tiedot
-        fileName.value = file.name;
-        mimeType.value = file.type;
+      // Aseta tiedoston metat
+      fileName.value = file.name;
+      mimeType.value = file.type;
 
+      try {
         // Muunna Base64:ksi
-        const dataURL = await fileToBase64(file);
+        const dataURL = await new Promise((res, rej) => {
+          const reader = new FileReader();
+          reader.onload    = () => res(reader.result);
+          reader.onerror   = () => rej('Lukeminen epäonnistui');
+          reader.readAsDataURL(file);
+        });
         imageData.value = dataURL.split(',')[1];
 
-        // Lähetä AJAX POST
-        const formData = new FormData(form);
-        const resp     = await fetch(form.action, {
+        // Lähetä AJAX:lla
+        const fd   = new FormData(form);
+        const resp = await fetch(form.action, {
           method: 'POST',
-          body: new URLSearchParams(formData)
+          body:   new URLSearchParams(fd)
         });
-        const text     = await resp.text();
+        const text = await resp.text();
         status.textContent = text;
-        status.classList.toggle('text-red-500', !resp.ok);
         status.classList.toggle('text-green-600', resp.ok);
+        status.classList.toggle('text-red-500', !resp.ok);
         if (resp.ok) form.reset();
       } catch (err) {
-        status.textContent = 'Virhe: ' + err.message;
+        status.textContent = 'Virhe: ' + err;
         status.classList.add('text-red-500');
       }
     });
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload  = () => resolve(reader.result);
-        reader.onerror = err => reject(err);
-        reader.readAsDataURL(file);
-      });
-    }
   </script>
 </body>
 </html>
