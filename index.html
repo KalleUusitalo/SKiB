@@ -20,6 +20,36 @@
       max-width: 400px;
       width: 100%;
     }
+    /* Kameran videokehys ja korttimuotoinen rajaus */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 62.5%; /* 16:10 aspect ratio */
+      background: #000;
+      overflow: hidden;
+      border-radius: .5rem;
+    }
+    .video-wrapper video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #overlay {
+      position: absolute;
+      /* Korttimuotoinen alue */
+      top: 12%; left: 8%;
+      width: 84%; height: 56%;
+      border: 2px dashed #fff;
+      border-radius: .5rem;
+      pointer-events: none;
+    }
+    #captureCanvas {
+      display: none;
+      width: 100%;
+      border-radius: .5rem;
+    }
   </style>
 </head>
 <body>
@@ -34,33 +64,136 @@
         <label for="email" class="form-label">Sähköposti</label>
         <input type="email" class="form-control" id="email" name="email" placeholder="sahkoposti@esimerkki.fi" required>
       </div>
+
+      <!-- Kameraosio -->
+      <div id="camera-container" class="mb-3 text-center">
+        <div class="video-wrapper mx-auto" id="videoWrapper">
+          <video id="video" autoplay playsinline></video>
+          <div id="overlay"></div>
+          <canvas id="captureCanvas"></canvas>
+        </div>
+        <div class="mt-2" id="camera-buttons">
+          <button type="button" id="captureBtn" class="btn btn-secondary">Ota kuva kortista</button>
+          <button type="button" id="retakeBtn" class="btn btn-secondary d-none">Ota uusi kuva</button>
+        </div>
+      </div>
+
       <button type="submit" class="btn btn-primary w-100">Lähetä</button>
       <div id="response" class="mt-3 text-center"></div>
     </form>
   </div>
 
   <script>
-    // TODO: korvaa alla oleva omalla Web App -URL:llasi
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec';
-    const form = document.getElementById('contactForm');
+    // KORVAA OMA WEB APP -URL:LLASI
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxYOUR_WEB_APP_ID/exec';
+
+    const video    = document.getElementById('video');
+    const overlay  = document.getElementById('overlay');
+    const canvas   = document.getElementById('captureCanvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const retakeBtn  = document.getElementById('retakeBtn');
+    const form     = document.getElementById('contactForm');
     const responseDiv = document.getElementById('response');
 
+    let croppedCanvas = null;
+
+    // Käyttäjän kameran avaaminen
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    })
+    .then(stream => {
+      video.srcObject = stream;
+    })
+    .catch(err => {
+      console.error('Kameran avaaminen epäonnistui:', err);
+      captureBtn.disabled = true;
+    });
+
+    // "Ota kuva" -toiminto
+    captureBtn.addEventListener('click', () => {
+      // Lasketaan rajausalue videon koordinaatistossa
+      const videoRect   = video.getBoundingClientRect();
+      const overlayRect = overlay.getBoundingClientRect();
+      const scaleX = video.videoWidth  / videoRect.width;
+      const scaleY = video.videoHeight / videoRect.height;
+      const sx = (overlayRect.left - videoRect.left) * scaleX;
+      const sy = (overlayRect.top  - videoRect.top)  * scaleY;
+      const sWidth  = overlayRect.width  * scaleX;
+      const sHeight = overlayRect.height * scaleY;
+
+      // Luodaan uusi canvas rajatulle kuvalle
+      croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width  = sWidth;
+      croppedCanvas.height = sHeight;
+      const ctx = croppedCanvas.getContext('2d');
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+
+      // Näytetään rajattu kuva pääsivun canvas-elementissä
+      canvas.width  = sWidth;
+      canvas.height = sHeight;
+      canvas.style.display = 'block';
+      canvas.getContext('2d').drawImage(croppedCanvas, 0, 0);
+
+      // Piilotetaan video ja vaihdetaan napit
+      video.style.display = 'none';
+      overlay.style.display = 'none';
+      captureBtn.classList.add('d-none');
+      retakeBtn.classList.remove('d-none');
+    });
+
+    // "Ota uusi kuva" -toiminto
+    retakeBtn.addEventListener('click', () => {
+      croppedCanvas = null;
+      canvas.style.display = 'none';
+      video.style.display = 'block';
+      overlay.style.display = 'block';
+      captureBtn.classList.remove('d-none');
+      retakeBtn.classList.add('d-none');
+    });
+
+    // Lomakkeen lähetys
     form.addEventListener('submit', e => {
       e.preventDefault();
+      const nameVal  = form.name.value.trim();
+      const emailVal = form.email.value.trim();
+      if (!nameVal || !emailVal) return;
+
       responseDiv.textContent = 'Lähetetään…';
-      fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-        .then(r => {
-          if (r.ok) {
-            responseDiv.textContent = 'Kiitos! Lomakkeesi on lähetetty.';
-            form.reset();
-          } else {
+
+      const sendForm = fd => {
+        fetch(scriptURL, { method: 'POST', body: fd })
+          .then(r => r.json())
+          .then(json => {
+            if (json.result === 'success') {
+              responseDiv.textContent = 'Kiitos! Lomakkeesi on lähetetty.';
+              form.reset();
+              retakeBtn.click();  // palautetaan kamera
+            } else {
+              console.error('Palvelimen virhe:', json.error);
+              responseDiv.textContent = 'Virhe lähetyksessä. Yritä hetken päästä uudelleen.';
+            }
+          })
+          .catch(err => {
+            console.error('Fetch error:', err);
             responseDiv.textContent = 'Virhe lähetyksessä. Yritä hetken päästä uudelleen.';
-          }
-        })
-        .catch(err => {
-          console.error('Error!', err);
-          responseDiv.textContent = 'Virhe lähetyksessä. Yritä hetken päästä uudelleen.';
-        });
+          });
+      };
+
+      // Kootaan FormData
+      const fd = new FormData();
+      fd.append('name',  nameVal);
+      fd.append('email', emailVal);
+
+      if (croppedCanvas) {
+        // Muodostetaan PNG-blob ja liitetään
+        croppedCanvas.toBlob(blob => {
+          fd.append('image', blob, nameVal + '_kortti.png');
+          sendForm(fd);
+        }, 'image/png');
+      } else {
+        sendForm(fd);
+      }
     });
   </script>
 </body>
