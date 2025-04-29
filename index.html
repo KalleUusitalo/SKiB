@@ -3,209 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Yhteydenotto</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Ota ja lähetä kuva</title>
   <style>
+    /* Yksinkertainen, moderni ja responsiivinen ulkoasu */
     body {
-      background: linear-gradient(135deg, #eef2ff 0%, #e0f7fa 100%);
-      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
       display: flex;
       align-items: center;
       justify-content: center;
+      min-height: 100vh;
     }
-    .card {
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 400px;
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 420px;
+      width: 90%;
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      text-align: center;
+      color: #333;
+    }
+    .input-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-size: 0.9rem;
+    }
+    input[type="file"] {
       width: 100%;
     }
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      padding-top: 62.5%;
-      background: #000;
-      overflow: hidden;
-      border-radius: .5rem;
-      display: none;
+    #preview img {
+      display: block;
+      max-width: 100%;
+      border-radius: 0.25rem;
+      margin-top: 1rem;
     }
-    .video-wrapper video {
-      position: absolute;
-      top: 0; left: 0;
+    button {
+      background: #0069d9;
+      color: #fff;
+      border: none;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      transition: background 0.2s ease-in-out;
     }
-    #overlay {
-      position: absolute;
-      top: 23.5%; left: 8%;
-      width: 84%; height: 52.97%;
-      pointer-events: none;
-      border-radius: .5rem;
+    button:hover {
+      background: #0053ba;
     }
-    #captureCanvas {
-      display: none;
-      width: 100%;
-      aspect-ratio: 1.586;
-      border-radius: .75rem;
-      background: #000;
-      object-fit: cover;
+    #status {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #28a745;
+    }
+    #status.error {
+      color: #dc3545;
     }
   </style>
 </head>
 <body>
-  <div class="card p-4">
-    <h2 class="text-center mb-4">Ota yhteyttä</h2>
-    <form id="contactForm">
-      <div class="mb-3">
-        <label for="name" class="form-label">Nimi</label>
-        <input type="text" class="form-control" id="name" name="name"
-               placeholder="Etunimi Sukunimi" required>
+  <div class="container">
+    <h1>Ota ja lähetä kuva</h1>
+    <form id="photo-form">
+      <div class="input-group">
+        <label for="photo">Valitse tiedosto tai ota kuva:</label>
+        <input type="file"
+               accept="image/*"
+               capture="environment"
+               id="photo"
+               name="photo"
+               required>
       </div>
-      <div class="mb-3">
-        <label for="email" class="form-label">Sähköposti</label>
-        <input type="email" class="form-control" id="email" name="email"
-               placeholder="sahkoposti@esimerkki.fi" required>
-      </div>
-
-      <div id="camera-container" class="mb-3 text-center">
-        <button type="button" id="openCameraBtn" class="btn btn-secondary">
-          Ota kuva kortista
-        </button>
-        <div class="video-wrapper mt-2" id="videoWrapper">
-          <video id="video" autoplay playsinline></video>
-          <div id="overlay"></div>
-        </div>
-        <canvas id="captureCanvas" class="mt-2"></canvas>
-        <div class="mt-2">
-          <button type="button" id="snapBtn" class="btn btn-secondary d-none">
-            Ota kuva
-          </button>
-          <button type="button" id="retakeBtn" class="btn btn-secondary d-none">
-            Ota uusi kuva
-          </button>
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100">Lähetä</button>
-      <div id="response" class="mt-3 text-center"></div>
+      <div id="preview"></div>
+      <button type="submit">Lähetä</button>
     </form>
+    <div id="status"></div>
   </div>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec';
+    // Korvaa tähän omalla GAS-webapp-URL:llasi, jonka saat deployn jälkeen!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/OMA_SCRIPT_ID/exec';
 
-    const openCameraBtn = document.getElementById('openCameraBtn');
-    const videoWrapper  = document.getElementById('videoWrapper');
-    const video         = document.getElementById('video');
-    const overlay       = document.getElementById('overlay');
-    const snapBtn       = document.getElementById('snapBtn');
-    const retakeBtn     = document.getElementById('retakeBtn');
-    const canvas        = document.getElementById('captureCanvas');
-    const form          = document.getElementById('contactForm');
-    const responseDiv   = document.getElementById('response');
-    let stream = null;
+    const form    = document.getElementById('photo-form');
+    const input   = document.getElementById('photo');
+    const preview = document.getElementById('preview');
+    const status  = document.getElementById('status');
 
-    openCameraBtn.addEventListener('click', async () => {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false
-        });
-        video.srcObject = stream;
-        video.play();
-        videoWrapper.style.display = 'block';
-        snapBtn.classList.remove('d-none');
-        openCameraBtn.classList.add('d-none');
-      } catch (err) {
-        console.error(err);
-        responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
-      }
+    // Kuvan esikatselu
+    input.addEventListener('change', () => {
+      preview.innerHTML = '';
+      if (!input.files || !input.files[0]) return;
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(input.files[0]);
+      preview.appendChild(img);
     });
 
-    snapBtn.addEventListener('click', () => {
-      const vRect  = video.getBoundingClientRect();
-      const oRect  = overlay.getBoundingClientRect();
-      const scaleX = video.videoWidth  / vRect.width;
-      const scaleY = video.videoHeight / vRect.height;
-      const sx     = (oRect.left - vRect.left) * scaleX;
-      const sy     = (oRect.top  - vRect.top)  * scaleY;
-      const sw     = oRect.width  * scaleX;
-      const sh     = oRect.height * scaleY;
-
-      const tmp = document.createElement('canvas');
-      tmp.width  = sw;
-      tmp.height = sh;
-      tmp.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
-
-      const maxW = 600;
-      const scale = Math.min(1, maxW / sw);
-      const fw = sw * scale, fh = sh * scale;
-
-      canvas.width  = fw;
-      canvas.height = fh;
-      canvas.getContext('2d').drawImage(tmp, 0, 0, sw, sh, 0, 0, fw, fh);
-
-      canvas.style.display = 'block';
-      stream.getTracks().forEach(t => t.stop());
-      videoWrapper.style.display = 'none';
-      snapBtn.classList.add('d-none');
-      retakeBtn.classList.remove('d-none');
-    });
-
-    retakeBtn.addEventListener('click', async () => {
-      canvas.style.display = 'none';
-      retakeBtn.classList.add('d-none');
-      snapBtn.classList.remove('d-none');
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false
-        });
-        video.srcObject = stream;
-        video.play();
-        videoWrapper.style.display = 'block';
-      } catch (err) {
-        console.error(err);
-        responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
-      }
-    });
-
-    form.addEventListener('submit', async e => {
+    // Lähetyskäsittely
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      const name  = form.name.value.trim();
-      const email = form.email.value.trim();
-      if (!name || !email) return;
-      responseDiv.textContent = 'Lähetetään…';
-
-      const payload = { name, email };
-      if (canvas.style.display === 'block') {
-        const dataUrl = canvas.toDataURL('image/png', 0.8);
-        payload.image    = dataUrl.split(',')[1];
-        payload.filename = name.replace(/\s+/g,'_') + '_kortti.png';
+      if (!input.files || !input.files[0]) {
+        status.textContent = 'Valitse ensin kuva.';
+        status.classList.add('error');
+        return;
       }
+      status.textContent = 'Lähetetään…';
+      status.classList.remove('error');
 
-      try {
-        const res  = await fetch(scriptURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const json = await res.json();
-        if (json.result === 'success') {
-          responseDiv.textContent = 'Kiitos! Lomakkeesi on lähetetty.';
-          form.reset();
-          canvas.style.display = 'none';
-          retakeBtn.classList.add('d-none');
-          openCameraBtn.classList.remove('d-none');
-        } else {
-          console.error(json.error);
-          responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
-        }
-      } catch (err) {
+      const formData = new FormData();
+      formData.append('photo', input.files[0]);
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors'            // GitHub Pages → Apps Script CORS-bypassi
+      })
+      .then(() => {
+        status.textContent = 'Kiitos! Kuva lähetetty.';
+      })
+      .catch(err => {
         console.error(err);
-        responseDiv.textContent = 'Jokin meni vikaan. Yritä hetken päästä uudelleen.';
-      }
+        status.textContent = 'Virhe lähetyksessä.';
+        status.classList.add('error');
+      });
     });
   </script>
 </body>
