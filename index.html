@@ -1,560 +1,101 @@
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="fi" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MVR-Yhtymä Oy – Perehdytyslomake</title>
-  <style>
-    :root {
-      --primary-color: #007bff;
-      --primary-hover: #0056b3;
-      --bg-light: #f5f5f5;
-      --bg-white: #fff;
-      --text-dark: #333;
-      --radius: 8px;
-      --spacing: 16px;
-    }
-    html, body { margin: 0; padding: 0; overflow-x: hidden; }
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      line-height: 1.5;
-    }
-    header {
-      background: var(--bg-white);
-      padding: var(--spacing);
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    header h1 { margin: 0; font-size: 2rem; }
-    main {
-      max-width: 900px;
-      margin: var(--spacing) auto;
-      padding: 0 var(--spacing);
-    }
-    section {
-      background: var(--bg-white);
-      margin-bottom: var(--spacing);
-      padding: var(--spacing);
-      border-radius: var(--radius);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-      border-bottom: 2px solid var(--primary-color);
-      padding-bottom: 0.25em;
-    }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--spacing);
-    }
-    @media (min-width: 600px) {
-      .form-grid { grid-template-columns: 1fr 1fr; }
-    }
-    .form-group { display: flex; flex-direction: column; }
-    label { font-weight: bold; margin-bottom: 0.5em; }
-    input, select, textarea, button, canvas, img {
-      font-size: 1rem;
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      border-radius: var(--radius);
-      width: 100%; max-width: 100%;
-    }
-    input:invalid, select:invalid { border-color: red; }
-    button {
-      margin-top: var(--spacing);
-      background: var(--primary-color);
-      color: var(--bg-white);
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover { background: var(--primary-hover); }
-    .btn-group { display: flex; gap: var(--spacing); }
-    .hidden { display: none; }
-    ul { padding-left: 1em; margin: 0; }
-    a { color: var(--primary-color); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    canvas.signature {
-      border: 1px solid #ccc;
-      cursor: crosshair;
-      height: 200px; width: 100%;
-    }
-    #signature-preview {
-      display: block;
-      border: 1px solid #ccc;
-      border-radius: var(--radius);
-      margin-top: var(--spacing);
-      max-width: 100%;
-    }
-    #camera-modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255,255,255,0.9);
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      z-index: 1000;
-    }
-    #camera-modal.hidden { display: none; }
-    #camera-video {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
-    }
-    .camera-overlay {
-      position: absolute; top: 50%; left: 50%;
-      width: 300px; height: 190px;
-      margin-left: -150px; margin-top: -95px;
-      box-shadow: 0 0 0 2000px rgba(255,255,255,0.8);
-      border: 2px dashed var(--primary-color);
-      border-radius: 8px;
-    }
-    .camera-controls {
-      position: absolute; bottom: var(--spacing);
-      display: flex; gap: var(--spacing);
-    }
-  </style>
-
-  <!-- Google API client & auth2 -->
-  <script async defer src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ota kuva ja lähetä</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    const CLIENT_ID     = '532156794647-r26r57kbpamkmvea5vtc6hdnjahjjqe0.apps.googleusercontent.com';
-    const SCOPES        = 'https://www.googleapis.com/auth/gmail.send';
-    const DISCOVERY_DOCS= ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'];
-
-    function handleClientLoad() {
-      gapi.load('client:auth2', initClient);
-    }
-    async function initClient() {
-      await gapi.auth2.init({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        ux_mode: 'popup'
-      });
-      await gapi.client.init({ discoveryDocs: DISCOVERY_DOCS });
-    }
-    async function ensureSignedIn() {
-      const auth = gapi.auth2.getAuthInstance();
-      if (!auth) throw new Error('Google Auth ei alustunut');
-      if (!auth.isSignedIn.get()) {
-        await auth.signIn();
-      }
-    }
-    function makeEmailBody(to, bcc, subject, html) {
-      const headers = [
-        `To: ${to}`,
-        `Bcc: ${bcc}`,
-        'From: mvrskib@gmail.com',
-        `Subject: ${subject}`,
-        'Content-Type: text/html; charset=UTF-8',
-        '',
-        html
-      ].join('\r\n');
-      return btoa(unescape(encodeURIComponent(headers)))
-        .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-    }
-    async function sendEmail(to, bcc, subject, html) {
-      await ensureSignedIn();
-      const raw = makeEmailBody(to, bcc, subject, html);
-      return gapi.client.gmail.users.messages.send({
-        userId: 'me',
-        resource: { raw }
-      });
-    }
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+          },
+        },
+      },
+    };
   </script>
 </head>
-<body>
-  <header>
-    <h1>MVR-Yhtymä Oy</h1>
-    <p>Perehdytyslomake – Bss + SKiB Kampus työmaa</p>
-  </header>
-  <main>
-    <form id="orientationForm">
-      <!-- OSA 1 -->
-      <section>
-        <h2>Osa 1 – Perehdytys</h2>
-        <div class="form-group">
-          <label>FOREIGN PERSONS</label>
-          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank">Suorita perehdytys tästä</a>
-        </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="valtti">1. VALTTI-kortin numero (12 merkkiä)</label>
-            <input id="valtti" name="valtti" type="text" pattern="\d{12}" required placeholder="123456789012" />
-          </div>
-          <div class="form-group">
-            <label for="card_photo">1b. Korttikuvan otto</label>
-            <button type="button" id="open-camera">Ota kuva kortista</button>
-            <input type="hidden" name="card_photo_data" id="card_photo_data" />
-            <img id="card-photo-preview" class="hidden" alt="Korttikuvan esikatselu" />
-          </div>
-          <div class="form-group">
-            <label for="veronumero">2. Veronumero (jos ei Valttia)</label>
-            <input id="veronumero" name="veronumero" type="text" pattern="\d{12}" placeholder="100012345678" />
-          </div>
-          <div class="form-group">
-            <label for="yritys">3. Yritys</label>
-            <input id="yritys" name="yritys" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="tilaaja">4. Tilaaja</label>
-            <select id="tilaaja" name="tilaaja" required>
-              <option value="">-- Valitse --</option>
-              <option>Svenska Kulturfonden i Björneborg -säätiö</option>
-              <option>MVR-Yhtymä Oy</option>
-              <option>Ilmastointi Salminen Oy</option>
-              <option>Mekeltek Oy</option>
-              <option>Prepon Oy</option>
-              <option>Vehmasputki Oy</option>
-              <option>Timantti-Nieminen Oy</option>
-              <option>Paloff Sammutusjärjestelmät Oy</option>
-              <option>Trentec Oy</option>
-              <option>En tiedä</option>
-              <option value="muu">Muu</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="syntymaan">5. Syntymäaika</label>
-            <input id="syntymaan" name="syntymaan" type="date" required />
-          </div>
-          <div class="form-group">
-            <label for="sukunimi">6. Sukunimi</label>
-            <input id="sukunimi" name="sukunimi" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="etunimi">7. Etunimi</label>
-            <input id="etunimi" name="etunimi" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="puhelin">8. Puhelinnumero</label>
-            <input id="puhelin" name="puhelin" type="tel" required placeholder="+358 44 123 1234" />
-          </div>
-          <div class="form-group">
-            <label for="sahkoposti">9. Sähköposti</label>
-            <input id="sahkoposti" name="sahkoposti" type="email" required />
-          </div>
-          <div class="form-group">
-            <label for="rooli">10. Rooli</label>
-            <select id="rooli" name="rooli" required>
-              <option value="">-- Valitse --</option>
-              <option>Työntekijä</option>
-              <option>Työnjohtaja</option>
-              <option>Vierailija</option>
-              <option>Harjoittelija</option>
-              <option>Muu</option>
-            </select>
-          </div>
-          <div class="form-group hidden" id="kouluyhteyshenkilo_group">
-            <label for="kouluyhteyshenkilo">11. Koulun yhteyshenkilö (harjoittelija)</label>
-            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero" />
-          </div>
-          <div class="form-group">
-            <label for="kansalaisuus">12. Kansalaisuus</label>
-            <select id="kansalaisuus" name="kansalaisuus" required>
-              <option value="">-- Valitse --</option>
-              <option value="suomi">Suomi</option>
-              <option value="foreign">Foreign Persons</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="pvaltion">13. Pääasiallinen työskentelyvaltio</label>
-            <input id="pvaltion" name="pvaltion" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="kieli">14. Kieli</label>
-            <input id="kieli" name="kieli" type="text" required />
-          </div>
-          <div class="form-group">
-            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa (kk/vuosi)</label>
-            <input id="ttkortti_voi" name="ttkortti_voi" type="text" placeholder="MM/YYYY" required />
-          </div>
-          <div class="form-group">
-            <label for="ttkortti_num">16. Työturvallisuuskortin numero</label>
-            <input id="ttkortti_num" name="ttkortti_num" type="text" placeholder="Numero" />
-          </div>
-          <div class="form-group">
-            <label for="tko_voi">17. Tulityökortti voimassa (kk/vuosi)</label>
-            <input id="tko_voi" name="tko_voi" type="text" placeholder="MM/YYYY" />
-          </div>
-          <div class="form-group">
-            <label for="tko_num">18. Tulityökortin numero</label>
-            <input id="tko_num" name="tko_num" type="text" placeholder="Numero" />
-          </div>
-        </div>
-      </section>
-
-      <!-- OSA 2 -->
-      <section>
-        <h2>Osa 2 – Perehdytyksen tavoitteet</h2>
-        <ul>
-          <li>Työturvallisuuden merkitys ja vastuunkanto</li>
-          <li>Työmaan pelisäännöt ja riskien tunnistus</li>
-          <li>Henkilösuojaimien käyttö</li>
-          <li>Pelastus- ja ensiapumenettelyt</li>
-        </ul>
-      </section>
-
-      <!-- OSA 3 -->
-      <section>
-        <h2>Osa 3 – Perehdytysvastuut</h2>
-        <ul>
-          <li><strong>Pääurakoitsija:</strong> Valvoo perehdytyksen kokonaisuutta</li>
-          <li><strong>Työnjohtaja:</strong> Vastaa aliurakoitsijoiden perehdytyksestä</li>
-          <li><strong>Perehdyttäjä:</strong> Esittelee kohteen turvallisuusnäkökohdat</li>
-          <li><strong>Työntekijä:</strong> Osallistuu aktiivisesti ja ilmoittaa riskeistä</li>
-        </ul>
-      </section>
-
-      <!-- OSA 4 -->
-      <section>
-        <h2>Osa 4 – Perehdytyksen sisältö</h2>
-        <ul>
-          <li>Työmaan tilat, kulkureitit ja varastointipaikat</li>
-          <li>Jätteiden- ja puhtaudenhallinta (P1-vaihe)</li>
-          <li>Kosteudenhallinta ja ympäristönäkökohdat</li>
-          <li>Tulityöt, paloturvallisuus ja sähköturvallisuus</li>
-          <li>Nostotyöt ja työturvallisuusohjeet</li>
-        </ul>
-      </section>
-
-      <!-- OSA 5 -->
-      <section>
-        <h2>Osa 5 – Työmaakierros ja riskikartoitus</h2>
-        <ul>
-          <li>Kulkureitit ja poistumistiet</li>
-          <li>Nosturi- ja nostokaluston riskit</li>
-          <li>Sähkö- ja automaatiotilojen vaarat</li>
-          <li>Erityisalueiden (kosteus, pöly, melu) riskit</li>
-        </ul>
-      </section>
-
-      <!-- OSA 6 -->
-      <section>
-        <h2>Osa 6 – Pelastus ja ensiapu</h2>
-        <p><strong>Hätänumero:</strong> 112</p>
-        <p><strong>Kokoontumispaikka:</strong> Liisantori</p>
-        <ul>
-          <li>Taukotila</li>
-          <li>Miesten sosiaalitila</li>
-          <li>Katusiiven sisäänkäynti (katoksen alla)</li>
-          <li>Kerrostasanteet (rappukäytävä)</li>
-        </ul>
-      </section>
-
-      <!-- OSA 7 -->
-      <section>
-        <h2>Osa 7 – Henkilösuojaimet</h2>
-        <ul>
-          <li>CE/EN397-kypärä leukahihnalla</li>
-          <li>Turvakengät naulasuojilla</li>
-          <li>Suojalasit, kuulonsuojaimet, hengityssuojaimet</li>
-        </ul>
-      </section>
-
-      <!-- OSA 8 -->
-      <section>
-        <h2>Osa 8 – Jätteiden hallinta</h2>
-        <ul>
-          <li>P1-puhtausluokka runko- ja peruskorjausvaiheessa</li>
-          <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puujäte, metallijäte, pahvi, kipsilevy, vaaralliset jätteet</li>
-        </ul>
-      </section>
-
-      <!-- OSA 9 -->
-      <section>
-        <h2>Osa 9 – Kosteudenhallinta</h2>
-        <p>Tavoitteena estää kosteusvauriot. Noudata suunnitelmia ja ilmoita poikkeamat välittömästi.</p>
-      </section>
-
-      <!-- OSA 10 -->
-      <section>
-        <h2>Osa 10 – Työturvallisuushavainnot</h2>
-        <p>Raportoi havainnoista osoitteessa <a href="http://teehavainto.fi/" target="_blank">teehavainto.fi</a>.</p>
-      </section>
-
-      <!-- OSA 11 -->
-      <section>
-        <h2>Osa 11 – Henkilöstö ja organisaatio</h2>
-        <ul>
-          <li>Veli-Matti Järvenpää – Vastaava työnjohtaja (050 521 8333)</li>
-          <li>Mika Kangasniemi – Työsuojelupäällikkö (050 305 1492)</li>
-          <li>Joonas Kekki – Työsuojelukoordinaattori (050 436 9411)</li>
-          <li>Antti Puhakka – Työsuojeluvaltuutettu (050 592 6259)</li>
-          <li>Kalle Uusitalo – Työmaainsinööri (044 401 3286)</li>
-          <li>Teemu Riita – Työnjohtaja (040 072 2022)</li>
-          <li>Ville Mattila – Työnjohtaja (043 826 6944)</li>
-          <li>Tommi Varjo – Työnjohtaja (044 291 9292)</li>
-        </ul>
-      </section>
-
-      <!-- OSA 12 -->
-      <section>
-        <h2>Osa 12 – Allekirjoitus</h2>
-        <div class="form-group">
-          <label for="signature-pad">22. Allekirjoitus</label>
-          <canvas id="signature-pad" class="signature"></canvas>
-        </div>
-        <div class="btn-group">
-          <button type="button" id="clear-signature">Tyhjennä allekirjoitus</button>
-        </div>
-        <input type="hidden" name="signature_data" id="signature_data" required />
-        <img id="signature-preview" class="hidden" alt="Allekirjoituksen esikatselu"/>
-      </section>
-
-      <button type="submit">Lähetä lomake</button>
-    </form>
-
-    <!-- Kamera-modali -->
-    <div id="camera-modal" class="hidden">
-      <video id="camera-video" autoplay playsinline></video>
-      <div class="camera-overlay"></div>
-      <div class="camera-controls">
-        <button type="button" id="take-photo">Ota kuva</button>
-        <button type="button" id="close-camera">Peruuta</button>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen p-4">
+  <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+    <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center">Ota kuva ja lähetä</h1>
+    <form id="myForm" action="https://script.google.com/macros/s/AKfycbw3zw9bz-2s4NpjY6xD28K9Z62E4FHie3WBhJpafHcutkocKlILj4a1SYURGt8onBJl0w/exec" method="post" class="space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium mb-1">Nimi</label>
+        <input id="name" name="name" type="text" required placeholder="Nimesi"
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 dark:bg-gray-700"/>
       </div>
-    </div>
-  </main>
+      <div>
+        <label for="email" class="block text-sm font-medium mb-1">Sähköposti</label>
+        <input id="email" name="email" type="email" required placeholder="Sähköpostisi"
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50 dark:bg-gray-700"/>
+      </div>
+      <div>
+        <label for="cameraInput" class="block text-sm font-medium mb-1">Ota kuva</label>
+        <input type="file" id="cameraInput" name="file" accept="image/*" capture="environment" required
+               class="block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-blue-700"/>
+      </div>
+      <!-- Piilotettu kenttä Base64-kuvakoodille -->
+      <input type="hidden" name="image" id="imageData">
+      <button type="submit"
+              class="w-full py-3 bg-primary hover:bg-blue-700 rounded-lg text-white font-semibold transition duration-200">
+        Lähetä
+      </button>
+      <p id="status" class="text-center text-sm mt-2"></p>
+    </form>
+  </div>
 
   <script>
-    // Signature pad setup
-    const bodyEl = document.body;
-    const canvasSig = document.getElementById('signature-pad');
-    const ctxSig    = canvasSig.getContext('2d');
-    const sigPre    = document.getElementById('signature-preview');
-    let drawing=false, lastX=0, lastY=0, origOverflow;
+    const form = document.getElementById('myForm');
+    const cameraInput = document.getElementById('cameraInput');
+    const imageData = document.getElementById('imageData');
+    const status = document.getElementById('status');
 
-    function resizeCan() {
-      const r = window.devicePixelRatio || 1;
-      const w = canvasSig.offsetWidth, h = canvasSig.offsetHeight;
-      canvasSig.width = w*r;
-      canvasSig.height = h*r;
-      ctxSig.scale(r, r);
-      ctxSig.lineCap = 'round';
-      ctxSig.lineJoin= 'round';
-      ctxSig.lineWidth= 2;
-      ctxSig.clearRect(0,0,w,h);
-    }
-    window.addEventListener('resize', resizeCan);
-    resizeCan();
-
-    function sDown(e) {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
-      drawing = true;
-      origOverflow = bodyEl.style.overflow;
-      bodyEl.style.overflow = 'hidden';
-      const rect = canvasSig.getBoundingClientRect();
-      lastX = (e.clientX||e.touches[0].clientX) - rect.left;
-      lastY = (e.clientY||e.touches[0].clientY) - rect.top;
-    }
-    function sUp() {
-      if (!drawing) return;
-      drawing = false;
-      bodyEl.style.overflow = origOverflow;
-      const data = canvasSig.toDataURL('image/png');
-      document.getElementById('signature_data').value = data;
-      sigPre.src = data;
-      sigPre.classList.remove('hidden');
-    }
-    function sMove(e) {
-      if (!drawing) return;
-      e.preventDefault();
-      const rect = canvasSig.getBoundingClientRect();
-      const x = (e.clientX||e.touches[0].clientX) - rect.left;
-      const y = (e.clientY||e.touches[0].clientY) - rect.top;
-      ctxSig.beginPath();
-      ctxSig.moveTo(lastX, lastY);
-      ctxSig.lineTo(x, y);
-      ctxSig.stroke();
-      lastX = x; lastY = y;
-    }
-    ['pointerdown','touchstart'].forEach(ev => canvasSig.addEventListener(ev, sDown));
-    ['pointerup','pointerout','touchend','touchcancel'].forEach(ev => canvasSig.addEventListener(ev, sUp));
-    ['pointermove','touchmove'].forEach(ev => canvasSig.addEventListener(ev, sMove));
-    document.getElementById('clear-signature').addEventListener('click', ()=>{
-      resizeCan();
-      sigPre.classList.add('hidden');
-    });
+      status.textContent = 'Lähetetään...';
 
-    // Camera modal
-    const openBtn = document.getElementById('open-camera');
-    const camModal= document.getElementById('camera-modal');
-    const videoEl = document.getElementById('camera-video');
-    const snapBtn = document.getElementById('take-photo');
-    const cancelBtn= document.getElementById('close-camera');
-    const inputPhoto= document.getElementById('card_photo_data');
-    const previewP = document.getElementById('card-photo-preview');
-    let camStream;
-
-    openBtn.addEventListener('click', async ()=>{
-      camModal.classList.remove('hidden');
-      try {
-        camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-        videoEl.srcObject = camStream;
-      } catch(err) {
-        alert('Kamera ei aukea: '+err.message);
-        camModal.classList.add('hidden');
+      const file = cameraInput.files[0];
+      if (!file) {
+        alert("Valitse kuva ensin!");
+        return;
       }
-    });
-    snapBtn.addEventListener('click', ()=>{
-      const w = videoEl.videoWidth, h = videoEl.videoHeight;
-      const tmp = document.createElement('canvas');
-      tmp.width = w; tmp.height = h;
-      tmp.getContext('2d').drawImage(videoEl,0,0);
-      const data = tmp.toDataURL('image/jpeg',0.8);
-      inputPhoto.value = data;
-      previewP.src = data;
-      previewP.classList.remove('hidden');
-      camModal.classList.add('hidden');
-      camStream.getTracks().forEach(t=>t.stop());
-    });
-    cancelBtn.addEventListener('click', ()=>{
-      camModal.classList.add('hidden');
-      if (camStream) camStream.getTracks().forEach(t=>t.stop());
-    });
-
-    // Submit handler
-    document.getElementById('orientationForm').addEventListener('submit', async function(e){
-      e.preventDefault();
-      const f = this.elements;
-      let html = `<h1>Perehdytyslomake – BSS + SKiB Kampus</h1>`;
-      html += `<p><strong>Valtti-kortti:</strong> ${f.valtti.value}</p>`;
-      html += `<p><strong>Kuva kortista:</strong><br><img src="${f.card_photo_data.value}" style="max-width:100%;"></p>`;
-      html += `<p><strong>Allekirjoitus:</strong><br><img src="${f.signature_data.value}" style="max-width:300px;"></p>`;
-      // ...lisää tarvittavat kentät...
 
       try {
-        await ensureSignedIn();
-        const userEmail = f.sahkoposti.value;
-        await sendEmail(
-          'kalle.uusitalo@mvr-yhtyma.fi',
-          userEmail,
-          `Perehdytyslomake: ${f.etunimi.value} ${f.sukunimi.value}`,
-          html
-        );
-        const msg = document.createElement('div');
-        msg.textContent = 'Perehdytys suoritettu – käy hakemassa MVR:n työmaatoimistosta "Perehdytetty" tarra.';
-        Object.assign(msg.style, {
-          position:'fixed', top:'20px', left:'50%',
-          transform:'translateX(-50%)',
-          background: 'var(--primary-color)',
-          color: '#fff',
-          padding: '1em',
-          borderRadius: '4px',
-          zIndex: 1001
+        const b64 = await fileToBase64(file);
+        imageData.value = b64.split(',')[1];
+        // Lähetä lomake AJAXilla, jotta voidaan näyttää palaute ilman uudelleenlatausta
+        const formData = new FormData(form);
+        const resp = await fetch(form.action, {
+          method: 'POST',
+          body: new URLSearchParams(formData)
         });
-        document.body.appendChild(msg);
-        setTimeout(()=>{
-          msg.remove();
-          this.reset();
-          previewP.classList.add('hidden');
-          sigPre.classList.add('hidden');
-          resizeCan();
-        }, 5000);
-      } catch(err) {
-        console.error(err);
-        alert('Lähetys epäonnistui: ' + err.message);
+        const text = await resp.text();
+        status.textContent = text;
+        if (!resp.ok) {
+          status.classList.add('text-red-500');
+        } else {
+          status.classList.remove('text-red-500');
+          status.classList.add('text-green-600');
+          form.reset();
+        }
+      } catch (err) {
+        status.textContent = 'Virhe: ' + err.message;
+        status.classList.add('text-red-500');
       }
     });
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = err => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
   </script>
 </body>
 </html>
