@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="fi">
 <head>
@@ -5,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ota ja lähetä kuva</title>
   <style>
-    /* Yksinkertainen, moderni ja responsiivinen ulkoasu */
+    /* --- Moderni, responsiivinen ulkoasu --- */
     body {
       margin: 0;
       padding: 0;
@@ -77,7 +78,11 @@
 <body>
   <div class="container">
     <h1>Ota ja lähetä kuva</h1>
-    <form id="photo-form">
+    <form id="photo-form"
+          action="https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec"
+          method="post"
+          enctype="multipart/form-data"
+          target="hidden_iframe">
       <div class="input-group">
         <label for="photo">Valitse tiedosto tai ota kuva:</label>
         <input type="file"
@@ -90,54 +95,35 @@
       <div id="preview"></div>
       <button type="submit">Lähetä</button>
     </form>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
     <div id="status"></div>
   </div>
 
   <script>
-    // Korvaa tähän omalla GAS-webapp-URL:llasi, jonka saat deployn jälkeen!
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZ8l6UOQV05ZNX-xrCeNUxxqLaAHY1PnsG9kckp70VcQuyTBAmdVJqub5W2at4khZ5GQ/exec';
-
-    const form    = document.getElementById('photo-form');
     const input   = document.getElementById('photo');
     const preview = document.getElementById('preview');
     const status  = document.getElementById('status');
+    const iframe  = document.getElementById('hidden_iframe');
 
-    // Kuvan esikatselu
+    // Esikatselu kun valitaan tai otetaan kuva
     input.addEventListener('change', () => {
       preview.innerHTML = '';
-      if (!input.files || !input.files[0]) return;
+      if (!input.files[0]) return;
       const img = document.createElement('img');
       img.src = URL.createObjectURL(input.files[0]);
       preview.appendChild(img);
     });
 
-    // Lähetyskäsittely
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      if (!input.files || !input.files[0]) {
-        status.textContent = 'Valitse ensin kuva.';
-        status.classList.add('error');
-        return;
-      }
-      status.textContent = 'Lähetetään…';
-      status.classList.remove('error');
-
-      const formData = new FormData();
-      formData.append('photo', input.files[0]);
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: formData,
-        mode: 'no-cors'            // GitHub Pages → Apps Script CORS-bypassi
-      })
-      .then(() => {
-        status.textContent = 'Kiitos! Kuva lähetetty.';
-      })
-      .catch(err => {
-        console.error(err);
-        status.textContent = 'Virhe lähetyksessä.';
-        status.classList.add('error');
+    // Näytetään lähetysstatus
+    document.getElementById('photo-form')
+      .addEventListener('submit', () => {
+        status.textContent = 'Lähetetään…';
+        status.classList.remove('error');
       });
+
+    // Kun iframe on latautunut (Apps Script vastaa “OK”), näytetään onnistumisviesti
+    iframe.addEventListener('load', () => {
+      status.textContent = 'Kiitos! Kuva lähetetty onnistuneesti.';
     });
   </script>
 </body>
