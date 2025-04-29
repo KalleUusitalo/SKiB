@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MVR-Yhtymä Oy – Perehdytyslomake</title>
   <style>
@@ -14,97 +14,108 @@
       --radius: 8px;
       --spacing: 16px;
     }
-    html, body { margin:0; padding:0; overflow-x:hidden; }
-    *, *::before, *::after { box-sizing:border-box; }
+    html, body { margin: 0; padding: 0; overflow-x: hidden; }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
       background: var(--bg-light);
       color: var(--text-dark);
-      line-height:1.5;
+      line-height: 1.5;
     }
     header {
       background: var(--bg-white);
       padding: var(--spacing);
-      text-align:center;
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    header h1 { margin:0; font-size:2rem; }
+    header h1 { margin: 0; font-size: 2rem; }
     main {
-      max-width:900px;
-      margin:var(--spacing) auto;
-      padding:0 var(--spacing);
+      max-width: 900px;
+      margin: var(--spacing) auto;
+      padding: 0 var(--spacing);
     }
     section {
       background: var(--bg-white);
       margin-bottom: var(--spacing);
       padding: var(--spacing);
       border-radius: var(--radius);
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     h2 {
-      margin-top:0;
-      font-size:1.5rem;
-      border-bottom:2px solid var(--primary-color);
-      padding-bottom:0.25em;
+      margin-top: 0;
+      font-size: 1.5rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.25em;
     }
     .form-grid {
-      display:grid;
-      grid-template-columns:1fr;
-      gap:var(--spacing);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing);
     }
-    @media(min-width:600px){ .form-grid{grid-template-columns:1fr 1fr;} }
-    .form-group{display:flex;flex-direction:column;}
-    label{font-weight:bold;margin-bottom:0.5em;}
-    input,select,textarea,button,canvas,img{
-      font-size:1rem;
-      padding:0.5em;
-      border:1px solid #ccc;
-      border-radius:var(--radius);
-      width:100%;max-width:100%;
+    @media (min-width: 600px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
     }
-    input:invalid,select:invalid{border-color:red;}
-    button{
-      margin-top:var(--spacing);
-      background:var(--primary-color);
-      color:var(--bg-white);
-      border:none;
-      cursor:pointer;
-      transition:background 0.2s;
+    .form-group { display: flex; flex-direction: column; }
+    label { font-weight: bold; margin-bottom: 0.5em; }
+    input, select, textarea, button, canvas, img {
+      font-size: 1rem;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      width: 100%; max-width: 100%;
     }
-    button:hover{background:var(--primary-hover);}
-    .btn-group{display:flex;gap:var(--spacing);}
-    .hidden{display:none;}
-    ul{padding-left:1em;margin:0;}
-    a{color:var(--primary-color);text-decoration:none;}
-    a:hover{text-decoration:underline;}
-    canvas.signature{border:1px solid #ccc;cursor:crosshair;height:200px;width:100%;}
-    #signature-preview{
-      display:block;
-      border:1px solid #ccc;
-      border-radius:var(--radius);
-      margin-top:var(--spacing);
-      max-width:100%;
+    input:invalid, select:invalid { border-color: red; }
+    button {
+      margin-top: var(--spacing);
+      background: var(--primary-color);
+      color: var(--bg-white);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    #camera-modal{
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:rgba(255,255,255,0.9);
-      display:flex;flex-direction:column;justify-content:center;align-items:center;
-      z-index:1000;
+    button:hover { background: var(--primary-hover); }
+    .btn-group { display: flex; gap: var(--spacing); }
+    .hidden { display: none; }
+    ul { padding-left: 1em; margin: 0; }
+    a { color: var(--primary-color); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    canvas.signature {
+      border: 1px solid #ccc;
+      cursor: crosshair;
+      height: 200px; width: 100%;
     }
-    #camera-modal.hidden{display:none;}
-    #camera-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
-    .camera-overlay{
-      position:absolute;top:50%;left:50%;
-      width:300px;height:190px;
-      margin-left:-150px;margin-top:-95px;
-      box-shadow:0 0 0 2000px rgba(255,255,255,0.8);
-      border:2px dashed var(--primary-color);
-      border-radius:8px;
+    #signature-preview {
+      display: block;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      margin-top: var(--spacing);
+      max-width: 100%;
     }
-    .camera-controls{position:absolute;bottom:var(--spacing);display:flex;gap:var(--spacing);}
+    #camera-modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      z-index: 1000;
+    }
+    #camera-modal.hidden { display: none; }
+    #camera-video {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .camera-overlay {
+      position: absolute; top: 50%; left: 50%;
+      width: 300px; height: 190px;
+      margin-left: -150px; margin-top: -95px;
+      box-shadow: 0 0 0 2000px rgba(255,255,255,0.8);
+      border: 2px dashed var(--primary-color);
+      border-radius: 8px;
+    }
+    .camera-controls {
+      position: absolute; bottom: var(--spacing);
+      display: flex; gap: var(--spacing);
+    }
   </style>
 
-  <!-- Load Google APIs -->
+  <!-- Google API client & auth2 -->
   <script async defer src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
   <script>
     const CLIENT_ID     = '532156794647-r26r57kbpamkmvea5vtc6hdnjahjjqe0.apps.googleusercontent.com';
@@ -114,26 +125,21 @@
     function handleClientLoad() {
       gapi.load('client:auth2', initClient);
     }
-
     async function initClient() {
-      // first init auth2 with popup UX
       await gapi.auth2.init({
         client_id: CLIENT_ID,
         scope: SCOPES,
         ux_mode: 'popup'
       });
-      // then init client library
       await gapi.client.init({ discoveryDocs: DISCOVERY_DOCS });
     }
-
     async function ensureSignedIn() {
       const auth = gapi.auth2.getAuthInstance();
-      if (!auth) throw new Error('Google Auth ei ole saatavilla');
+      if (!auth) throw new Error('Google Auth ei alustunut');
       if (!auth.isSignedIn.get()) {
-        await auth.signIn(); // popup
+        await auth.signIn();
       }
     }
-
     function makeEmailBody(to, bcc, subject, html) {
       const headers = [
         `To: ${to}`,
@@ -147,11 +153,10 @@
       return btoa(unescape(encodeURIComponent(headers)))
         .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
     }
-
     async function sendEmail(to, bcc, subject, html) {
       await ensureSignedIn();
       const raw = makeEmailBody(to, bcc, subject, html);
-      await gapi.client.gmail.users.messages.send({
+      return gapi.client.gmail.users.messages.send({
         userId: 'me',
         resource: { raw }
       });
@@ -174,7 +179,7 @@
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label for="valtti">1. VALTTI-kortin numero</label>
+            <label for="valtti">1. VALTTI-kortin numero (12 merkkiä)</label>
             <input id="valtti" name="valtti" type="text" pattern="\d{12}" required placeholder="123456789012" />
           </div>
           <div class="form-group">
@@ -241,7 +246,7 @@
           </div>
           <div class="form-group hidden" id="kouluyhteyshenkilo_group">
             <label for="kouluyhteyshenkilo">11. Koulun yhteyshenkilö (harjoittelija)</label>
-            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero"/>
+            <input id="kouluyhteyshenkilo" name="kouluyhteyshenkilo" type="text" placeholder="Nimi ja puhelinnumero" />
           </div>
           <div class="form-group">
             <label for="kansalaisuus">12. Kansalaisuus</label>
@@ -260,20 +265,20 @@
             <input id="kieli" name="kieli" type="text" required />
           </div>
           <div class="form-group">
-            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa</label>
-            <input id="ttkortti_voi" name="ttkortti_voi" type="text" placeholder="MM/YYYY" required/>
+            <label for="ttkortti_voi">15. Työturvallisuuskortti voimassa (kk/vuosi)</label>
+            <input id="ttkortti_voi" name="ttkortti_voi" type="text" placeholder="MM/YYYY" required />
           </div>
           <div class="form-group">
             <label for="ttkortti_num">16. Työturvallisuuskortin numero</label>
-            <input id="ttkortti_num" name="ttkortti_num" type="text" placeholder="Numero"/>
+            <input id="ttkortti_num" name="ttkortti_num" type="text" placeholder="Numero" />
           </div>
           <div class="form-group">
-            <label for="tko_voi">17. Tulityökortti voimassa</label>
-            <input id="tko_voi" name="tko_voi" type="text" placeholder="MM/YYYY"/>
+            <label for="tko_voi">17. Tulityökortti voimassa (kk/vuosi)</label>
+            <input id="tko_voi" name="tko_voi" type="text" placeholder="MM/YYYY" />
           </div>
           <div class="form-group">
             <label for="tko_num">18. Tulityökortin numero</label>
-            <input id="tko_num" name="tko_num" type="text" placeholder="Numero"/>
+            <input id="tko_num" name="tko_num" type="text" placeholder="Numero" />
           </div>
         </div>
       </section>
@@ -351,7 +356,7 @@
         <h2>Osa 8 – Jätteiden hallinta</h2>
         <ul>
           <li>P1-puhtausluokka runko- ja peruskorjausvaiheessa</li>
-          <li>Jätteiden lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puujäte, metallijäte, pahvi, kipsilevy, vaaralliset jätteet</li>
+          <li>Lajittelu: pakkausmuovi, sekajäte, betoni/tiili, puujäte, metallijäte, pahvi, kipsilevy, vaaralliset jätteet</li>
         </ul>
       </section>
 
@@ -393,7 +398,7 @@
           <button type="button" id="clear-signature">Tyhjennä allekirjoitus</button>
         </div>
         <input type="hidden" name="signature_data" id="signature_data" required />
-        <img id="signature-preview" class="hidden" alt="Allekirjoituksen esikatselu" />
+        <img id="signature-preview" class="hidden" alt="Allekirjoituksen esikatselu"/>
       </section>
 
       <button type="submit">Lähetä lomake</button>
@@ -411,7 +416,7 @@
   </main>
 
   <script>
-    // Signature pad
+    // Signature pad setup
     const bodyEl = document.body;
     const canvasSig = document.getElementById('signature-pad');
     const ctxSig    = canvasSig.getContext('2d');
@@ -419,112 +424,135 @@
     let drawing=false, lastX=0, lastY=0, origOverflow;
 
     function resizeCan() {
-      const r = window.devicePixelRatio||1;
+      const r = window.devicePixelRatio || 1;
       const w = canvasSig.offsetWidth, h = canvasSig.offsetHeight;
-      canvasSig.width = w*r; canvasSig.height = h*r;
-      ctxSig.scale(r,r);
-      ctxSig.lineCap='round'; ctxSig.lineJoin='round'; ctxSig.lineWidth=2;
+      canvasSig.width = w*r;
+      canvasSig.height = h*r;
+      ctxSig.scale(r, r);
+      ctxSig.lineCap = 'round';
+      ctxSig.lineJoin= 'round';
+      ctxSig.lineWidth= 2;
       ctxSig.clearRect(0,0,w,h);
     }
     window.addEventListener('resize', resizeCan);
     resizeCan();
 
     function sDown(e) {
-      e.preventDefault(); drawing=true;
-      origOverflow=bodyEl.style.overflow; bodyEl.style.overflow='hidden';
-      const rect=canvasSig.getBoundingClientRect();
-      lastX=(e.clientX||e.touches[0].clientX)-rect.left;
-      lastY=(e.clientY||e.touches[0].clientY)-rect.top;
+      e.preventDefault();
+      drawing = true;
+      origOverflow = bodyEl.style.overflow;
+      bodyEl.style.overflow = 'hidden';
+      const rect = canvasSig.getBoundingClientRect();
+      lastX = (e.clientX||e.touches[0].clientX) - rect.left;
+      lastY = (e.clientY||e.touches[0].clientY) - rect.top;
     }
     function sUp() {
-      if(!drawing) return;
-      drawing=false; bodyEl.style.overflow=origOverflow;
-      const data=canvasSig.toDataURL('image/png');
-      document.getElementById('signature_data').value=data;
-      sigPre.src=data; sigPre.classList.remove('hidden');
+      if (!drawing) return;
+      drawing = false;
+      bodyEl.style.overflow = origOverflow;
+      const data = canvasSig.toDataURL('image/png');
+      document.getElementById('signature_data').value = data;
+      sigPre.src = data;
+      sigPre.classList.remove('hidden');
     }
     function sMove(e) {
-      if(!drawing) return;
+      if (!drawing) return;
       e.preventDefault();
-      const rect=canvasSig.getBoundingClientRect();
-      const x=(e.clientX||e.touches[0].clientX)-rect.left;
-      const y=(e.clientY||e.touches[0].clientY)-rect.top;
-      ctxSig.beginPath(); ctxSig.moveTo(lastX,lastY); ctxSig.lineTo(x,y); ctxSig.stroke();
-      lastX=x; lastY=y;
+      const rect = canvasSig.getBoundingClientRect();
+      const x = (e.clientX||e.touches[0].clientX) - rect.left;
+      const y = (e.clientY||e.touches[0].clientY) - rect.top;
+      ctxSig.beginPath();
+      ctxSig.moveTo(lastX, lastY);
+      ctxSig.lineTo(x, y);
+      ctxSig.stroke();
+      lastX = x; lastY = y;
     }
-    ['pointerdown','touchstart'].forEach(ev=>canvasSig.addEventListener(ev,sDown));
-    ['pointerup','pointerout','touchend','touchcancel'].forEach(ev=>canvasSig.addEventListener(ev,sUp));
-    ['pointermove','touchmove'].forEach(ev=>canvasSig.addEventListener(ev,sMove));
-    document.getElementById('clear-signature').addEventListener('click',()=>{
-      resizeCan(); sigPre.classList.add('hidden');
+    ['pointerdown','touchstart'].forEach(ev => canvasSig.addEventListener(ev, sDown));
+    ['pointerup','pointerout','touchend','touchcancel'].forEach(ev => canvasSig.addEventListener(ev, sUp));
+    ['pointermove','touchmove'].forEach(ev => canvasSig.addEventListener(ev, sMove));
+    document.getElementById('clear-signature').addEventListener('click', ()=>{
+      resizeCan();
+      sigPre.classList.add('hidden');
     });
 
-    // Camera
-    const openCam=document.getElementById('open-camera'),
-          camModal=document.getElementById('camera-modal'),
-          videoEl=document.getElementById('camera-video'),
-          snapBtn=document.getElementById('take-photo'),
-          cancelBtn=document.getElementById('close-camera'),
-          inputPhoto=document.getElementById('card_photo_data'),
-          previewPhoto=document.getElementById('card-photo-preview');
+    // Camera modal
+    const openBtn = document.getElementById('open-camera');
+    const camModal= document.getElementById('camera-modal');
+    const videoEl = document.getElementById('camera-video');
+    const snapBtn = document.getElementById('take-photo');
+    const cancelBtn= document.getElementById('close-camera');
+    const inputPhoto= document.getElementById('card_photo_data');
+    const previewP = document.getElementById('card-photo-preview');
     let camStream;
 
-    openCam.addEventListener('click',async()=>{
+    openBtn.addEventListener('click', async ()=>{
       camModal.classList.remove('hidden');
       try {
-        camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-        videoEl.srcObject=camStream;
+        camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+        videoEl.srcObject = camStream;
       } catch(err) {
         alert('Kamera ei aukea: '+err.message);
         camModal.classList.add('hidden');
       }
     });
-    snapBtn.addEventListener('click',()=>{
-      const w=videoEl.videoWidth, h=videoEl.videoHeight;
-      const tmp=document.createElement('canvas'); tmp.width=w; tmp.height=h;
+    snapBtn.addEventListener('click', ()=>{
+      const w = videoEl.videoWidth, h = videoEl.videoHeight;
+      const tmp = document.createElement('canvas');
+      tmp.width = w; tmp.height = h;
       tmp.getContext('2d').drawImage(videoEl,0,0);
-      const data=tmp.toDataURL('image/jpeg',0.8);
-      inputPhoto.value=data; previewPhoto.src=data; previewPhoto.classList.remove('hidden');
-      camModal.classList.add('hidden'); camStream.getTracks().forEach(t=>t.stop());
+      const data = tmp.toDataURL('image/jpeg',0.8);
+      inputPhoto.value = data;
+      previewP.src = data;
+      previewP.classList.remove('hidden');
+      camModal.classList.add('hidden');
+      camStream.getTracks().forEach(t=>t.stop());
     });
-    cancelBtn.addEventListener('click',()=>{
-      camModal.classList.add('hidden'); if(camStream)camStream.getTracks().forEach(t=>t.stop());
+    cancelBtn.addEventListener('click', ()=>{
+      camModal.classList.add('hidden');
+      if (camStream) camStream.getTracks().forEach(t=>t.stop());
     });
 
-    // Submit
-    document.getElementById('orientationForm').addEventListener('submit',async function(e){
+    // Submit handler
+    document.getElementById('orientationForm').addEventListener('submit', async function(e){
       e.preventDefault();
+      const f = this.elements;
+      let html = `<h1>Perehdytyslomake – BSS + SKiB Kampus</h1>`;
+      html += `<p><strong>Valtti-kortti:</strong> ${f.valtti.value}</p>`;
+      html += `<p><strong>Kuva kortista:</strong><br><img src="${f.card_photo_data.value}" style="max-width:100%;"></p>`;
+      html += `<p><strong>Allekirjoitus:</strong><br><img src="${f.signature_data.value}" style="max-width:300px;"></p>`;
+      // ...lisää tarvittavat kentät...
+
       try {
         await ensureSignedIn();
-        const f = this.elements;
-        let html=`<h1>Perehdytyslomake – BSS + SKiB Kampus</h1>`;
-        html+=`<p><strong>Valtti:</strong> ${f.valtti.value}</p>`;
-        html+=`<p><strong>Kuva kortista:</strong><br><img src="${f.card_photo_data.value}" style="max-width:100%;"></p>`;
-        html+=`<p><strong>Allekirjoitus:</strong><br><img src="${f.signature_data.value}" style="max-width:300px;"></p>`;
-        // … lisää muut kentät …
-        const userEmail=gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail();
+        const userEmail = f.sahkoposti.value;
         await sendEmail(
           'kalle.uusitalo@mvr-yhtyma.fi',
           userEmail,
           `Perehdytyslomake: ${f.etunimi.value} ${f.sukunimi.value}`,
           html
         );
-        // Ilmoitus ja tyhjennys 5s jälkeen
         const msg = document.createElement('div');
         msg.textContent = 'Perehdytys suoritettu – käy hakemassa MVR:n työmaatoimistosta "Perehdytetty" tarra.';
-        msg.style = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#007bff;color:#fff;padding:1em;border-radius:4px;z-index:1001;';
+        Object.assign(msg.style, {
+          position:'fixed', top:'20px', left:'50%',
+          transform:'translateX(-50%)',
+          background: 'var(--primary-color)',
+          color: '#fff',
+          padding: '1em',
+          borderRadius: '4px',
+          zIndex: 1001
+        });
         document.body.appendChild(msg);
-        setTimeout(() => {
+        setTimeout(()=>{
           msg.remove();
           this.reset();
-          // reset previews & signature
-          previewPhoto.classList.add('hidden');
+          previewP.classList.add('hidden');
           sigPre.classList.add('hidden');
           resizeCan();
         }, 5000);
       } catch(err) {
         console.error(err);
-        alert('Lähetys epäonnistui: '+err.message);
+        alert('Lähetys epäonnistui: ' + err.message);
       }
     });
   </script>
