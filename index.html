@@ -6,7 +6,7 @@
   <title>Perehdytyslomake</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Estä sivun rullaus allekirjoitustilassa */
+    /* Estä sivun vieritys allekirjoitustilassa */
     #signature-pad.active {
       touch-action: none;
       overscroll-behavior: contain;
@@ -24,30 +24,17 @@
           target="hidden_iframe"
           class="space-y-8">
 
-      <!-- Osa 1 -->
-      <fieldset class="border p-4 rounded space-y-4">
-        <legend class="font-semibold text-lg">Osa 1</legend>
-        <p>
-          <strong>FOREIGN PERSONS:</strong> Complete the orientation from the attached link.<br/>
-          <strong>Ulkomaalaiset henkilöt:</strong> Suorita perehdytys
-          <a href="https://forms.office.com/e/rSUhYcH6DK" target="_blank" class="text-blue-600 underline">
-            tästä linkistä
-          </a>.
-        </p>
-        <div class="space-y-4">
-          <div>
-            <label class="block mb-1">1. VALTTI-kortin numero (12 merkkiä):</label>
-            <input type="text" name="valttikortti" pattern="\d{12}"
-                   class="w-full border px-3 py-2 rounded"/>
-            <small class="text-gray-600">Valttikortin numero on 12 merkin numerosarja viivakoodin alapuolella.</small>
-          </div>
-        </div>
+      <!-- 1) VALTTI-kortti -->
+      <fieldset class="border p-4 rounded space-y-2">
+        <legend class="font-semibold">1. VALTTI-kortin numero (12 merkkiä)</legend>
+        <input type="text" name="valttikortti" pattern="\d{12}"
+               class="w-full border px-3 py-2 rounded"/>
       </fieldset>
 
-      <!-- Osa 2: Ota tai lataa kuva heti VALTTI-kentän jälkeen -->
-      <fieldset class="border p-4 rounded space-y-4">
-        <legend class="font-semibold text-lg">Osa 2 – Ota tai lataa kuva</legend>
-        <div class="flex space-x-2 mb-4">
+      <!-- 2) Kuva (vapaaehtoinen) -->
+      <fieldset class="border p-4 rounded space-y-2">
+        <legend class="font-semibold">2. Ota tai lataa kuva (valinnainen)</legend>
+        <div class="flex space-x-2">
           <button type="button" id="open-camera"
                   class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             Ota kamera
@@ -59,17 +46,14 @@
           <input type="file" id="fileupload" accept="image/*" class="hidden"/>
         </div>
         <div id="preview" class="border p-2 rounded min-h-[100px]"></div>
-        <input type="hidden" name="filename" id="filename"/>
-        <input type="hidden" name="file" id="file"/>
+        <input type="hidden" name="filename"    id="filename"/>
+        <input type="hidden" name="file"        id="file"/>
         <input type="hidden" name="imageformat" id="imageformat"/>
       </fieldset>
 
-      <!-- (Lisää tähän muut lomakekentät Osa 3–Osa 11 tarpeen mukaan) -->
-
-      <!-- Allekirjoitus -->
-      <fieldset class="border p-4 rounded space-y-4">
-        <legend class="font-semibold text-lg">Allekirjoitus</legend>
-        <p>Hyväksyn perehdytyksen:</p>
+      <!-- 3) Allekirjoitus (pakollinen) -->
+      <fieldset class="border p-4 rounded space-y-2">
+        <legend class="font-semibold">3. Allekirjoitus (pakollinen)</legend>
         <div id="signature-pad" class="border rounded-lg relative">
           <canvas id="signature-canvas" class="w-full h-48"></canvas>
           <button type="button" id="clear-signature"
@@ -77,8 +61,8 @@
             Tyhjennä
           </button>
         </div>
-        <input type="hidden" name="signature" id="signature"/>
-        <input type="hidden" name="signatureformat" id="signatureformat" value="png"/>
+        <input type="hidden" name="signature"         id="signature"/>
+        <input type="hidden" name="signatureformat"   id="signatureformat" value="png"/>
         <input type="hidden" name="signaturefilename" id="signaturefilename"/>
       </fieldset>
 
@@ -105,11 +89,11 @@
     </div>
   </div>
 
-  <!-- Signature Pad Library -->
+  <!-- Signature Pad kirjasto -->
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 
   <script>
-    // Kamera ja tiedoston lataus
+    // 1) Kamera/lataus
     const openBtn    = document.getElementById('open-camera');
     const fileupload = document.getElementById('fileupload');
     const overlay    = document.getElementById('camera-overlay');
@@ -120,43 +104,38 @@
     const fileI      = document.getElementById('file');
     const fmtI       = document.getElementById('imageformat');
     let stream;
-
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
+        video:{ facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
       });
       video.srcObject = stream;
     });
     captureBtn.addEventListener('click', () => {
-      const vh = video.videoHeight, vw = video.videoWidth, aspect = 1.585;
-      const h = vh, w = Math.floor(h * aspect), sx = Math.floor((vw - w) / 2);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(video, sx, 0, w, h, 0, 0, w, h);
-      stream.getTracks().forEach(t => t.stop());
+      const vh=video.videoHeight, vw=video.videoWidth, aspect=1.585;
+      const h=vh, w=Math.floor(h*aspect), sx=Math.floor((vw-w)/2);
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(video,sx,0,w,h,0,0,w,h);
+      stream.getTracks().forEach(t=>t.stop());
       overlay.classList.add('hidden');
-      handleDataURL(canvas.toDataURL('image/jpeg', 0.8));
+      handleDataURL(c.toDataURL('image/jpeg',0.8));
     });
     fileupload.addEventListener('change', () => {
-      const f = fileupload.files[0];
-      if (!f) return;
-      const r = new FileReader();
-      r.onload = evt => handleDataURL(evt.target.result);
-      r.readAsDataURL(f);
+      const f=fileupload.files[0]; if(!f) return;
+      const r=new FileReader(); r.onload=evt=>handleDataURL(evt.target.result); r.readAsDataURL(f);
     });
-    function handleDataURL(dataURL) {
-      preview.innerHTML = `<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
-      const [hdr, b64] = dataURL.split(',');
-      const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
-      const ext = mime.split('/')[1].toLowerCase();
-      filenameI.value = `kuva_${Date.now()}.${ext}`;
-      fileI.value = b64;
-      fmtI.value = ext;
+    function handleDataURL(dataURL){
+      preview.innerHTML=`<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
+      const [hdr,b64]=dataURL.split(','), mime=hdr.match(/data:(image\/[A-Za-z]+);base64/)[1];
+      const ext=mime.split('/')[1].toLowerCase();
+      filenameI.value=`kuva_${Date.now()}.${ext}`;
+      fileI.value=b64;
+      fmtI.value=ext;
     }
 
-    // Signature Pad
+    // 2) Signature Pad
     const canvasEl = document.getElementById('signature-canvas');
+    const sigPadDiv = document.getElementById('signature-pad');
     const sigPad = new SignaturePad(canvasEl, { backgroundColor:'rgba(255,255,255,0)' });
     const clearBtn = document.getElementById('clear-signature');
     const sigInput = document.getElementById('signature');
@@ -166,52 +145,53 @@
     const form     = document.getElementById('send-form');
     let awaitingResponse = false;
 
-    function resizeCanvas() {
+    function resizeCanvas(){
       const ratio = Math.max(window.devicePixelRatio||1,1);
       canvasEl.width = canvasEl.offsetWidth * ratio;
-      canvasEl.height = canvasEl.offsetHeight * ratio;
-      canvasEl.getContext('2d').scale(ratio, ratio);
+      canvasEl.height= canvasEl.offsetHeight * ratio;
+      canvasEl.getContext('2d').scale(ratio,ratio);
       sigPad.clear();
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    clearBtn.addEventListener('click', () => {
+    clearBtn.addEventListener('click', ()=>{
       sigPad.clear();
       sigInput.value = '';
       checkFormReady();
     });
     sigPad.onEnd = checkFormReady;
 
-    function checkFormReady() {
+    function checkFormReady(){
       const ready = !sigPad.isEmpty();
-      if (ready) {
+      if(ready){
         const dataURL = sigPad.toDataURL('image/png');
         sigInput.value = dataURL.split(',')[1];
-        sigName.value = `signature_${Date.now()}.png`;
+        sigName.value  = `signature_${Date.now()}.png`;
       }
       sendBtn.disabled = !ready;
       sendBtn.classList.toggle('opacity-50', !ready);
       sendBtn.classList.toggle('cursor-not-allowed', !ready);
-      document.getElementById('signature-pad').classList.toggle('active', ready);
+      sigPadDiv.classList.toggle('active', ready);
     }
 
-    form.addEventListener('submit', () => {
+    // 3) Submission & response
+    form.addEventListener('submit', ()=>{
       awaitingResponse = true;
       statusDiv.textContent = 'Lähetetään…';
       statusDiv.classList.remove('hidden','error');
     });
-    window.addEventListener('message', event => {
-      if (!awaitingResponse) return;
+    window.addEventListener('message', event=>{
+      if(!awaitingResponse) return;
       awaitingResponse = false;
       const res = event.data;
-      if (res.error) {
-        statusDiv.textContent = 'Virhe: ' + res.error;
+      if(res.error){
+        statusDiv.textContent = 'Virhe: '+res.error;
         statusDiv.classList.add('error');
       } else {
         statusDiv.textContent = 'Kiitos! Lomake lähetetty onnistuneesti.';
       }
-      setTimeout(() => location.reload(), 5000);
+      setTimeout(()=>location.reload(),5000);
     });
   </script>
 </body>
