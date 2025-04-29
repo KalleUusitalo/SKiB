@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Ota ja lähetä kuva</title>
+  <title>Ota tai lataa kuva</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -11,7 +11,7 @@
   <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative">
     <h1 class="text-2xl font-semibold text-center mb-6">Ota tai lataa kuva</h1>
 
-    <!-- Valikko: ota kamera vai valitse tiedosto -->
+    <!-- Kamera- ja tiedostovalinta -->
     <div class="flex space-x-2 mb-4">
       <button id="open-camera"
               class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
@@ -27,9 +27,9 @@
              class="hidden">
     </div>
 
-    <!-- Lomake Base64‐kentille -->
+    <!-- Lähetä-lomake -->
     <form id="send-form"
-          action="https://script.google.com/macros/s/AKfycbwAGvUV_3KB6KOURCGPuPM63PH12e-uGK4VAw_DLeLEMnYws0ZIhuQbdWErgwRzVAfJ/exec"
+          action="https://script.google.com/macros/s/AKfycbx8HcZRpyKQLU3sxMBlj6irl09ZztFoSkLbTxImnTnTcSO5OaS-fiPKGraRKJtHpyYb_Q/exec"
           method="post"
           target="hidden_iframe">
       <input type="hidden" name="filename"    id="filename">
@@ -43,11 +43,11 @@
       </button>
     </form>
 
-    <!-- Esikatselu ja status -->
+    <!-- Esikatselu & status -->
     <div id="preview" class="mt-4"></div>
     <div id="status" class="mt-6 text-center text-lg text-gray-800 hidden"></div>
 
-    <!-- Piilotettu iframe postMessagea varten -->
+    <!-- Piilotettu iframe -->
     <iframe name="hidden_iframe" id="hidden_iframe" class="hidden"></iframe>
 
     <!-- Kamera-overlay -->
@@ -66,38 +66,36 @@
   </div>
 
   <script>
-    const openBtn     = document.getElementById('open-camera');
-    const fileupload  = document.getElementById('fileupload');
-    const overlay     = document.getElementById('camera-overlay');
-    const video       = document.getElementById('video');
-    const captureBtn  = document.getElementById('capture-button');
-    const preview     = document.getElementById('preview');
-    const form        = document.getElementById('send-form');
-    const sendBtn     = document.getElementById('send-button');
-    const filenameI   = document.getElementById('filename');
-    const fileI       = document.getElementById('file');
-    const fmtI        = document.getElementById('imageformat');
-    const statusDiv   = document.getElementById('status');
-    const iframe      = document.getElementById('hidden_iframe');
+    const openBtn    = document.getElementById('open-camera');
+    const fileupload = document.getElementById('fileupload');
+    const overlay    = document.getElementById('camera-overlay');
+    const video      = document.getElementById('video');
+    const captureBtn = document.getElementById('capture-button');
+    const preview    = document.getElementById('preview');
+    const form       = document.getElementById('send-form');
+    const sendBtn    = document.getElementById('send-button');
+    const filenameI  = document.getElementById('filename');
+    const fileI      = document.getElementById('file');
+    const fmtI       = document.getElementById('imageformat');
+    const statusDiv  = document.getElementById('status');
 
     let stream, awaitingResponse = false;
 
-    // --- 1) Kamera-tila ---
+    // 1) Avaa kamera
     openBtn.addEventListener('click', async () => {
       overlay.classList.remove('hidden');
-      // Pyydä 4K-video
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width:{ideal:3840}, height:{ideal:2160} }
+        video: { facingMode:'environment', width:{ideal:3840}, height:{ideal:2160} }
       });
       video.srcObject = stream;
     });
 
+    // 2) Ota kuva ja crop
     captureBtn.addEventListener('click', () => {
-      // Cropataan credit-card muotoiseksi
       const vh = video.videoHeight, vw = video.videoWidth;
       const aspect = 1.585;
-      const h = vh, w = Math.floor(h * aspect);
-      const sx = Math.floor((vw - w)/2), sy = 0;
+      const h = vh, w = Math.floor(h*aspect);
+      const sx = Math.floor((vw-w)/2), sy = 0;
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(video, sx, sy, w, h, 0, 0, w, h);
@@ -106,42 +104,37 @@
       handleDataURL(canvas.toDataURL('image/jpeg',0.8));
     });
 
-    // --- 2) Tiedoston lataus ---
+    // 3) Tiedoston lataus
     fileupload.addEventListener('change', () => {
       const file = fileupload.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = evt => {
-        handleDataURL(evt.target.result);
-      };
+      reader.onload = evt => handleDataURL(evt.target.result);
       reader.readAsDataURL(file);
     });
 
-    // --- käsittele Base64-data, olipa lähde kamera tai tiedosto ---
+    // 4) Käsittele Base64-data & esikatselu
     function handleDataURL(dataURL) {
-      // Esikatselu
       preview.innerHTML = `<img src="${dataURL}" class="rounded-lg shadow-md"/>`;
-      // Pure Base64:ksi
       const [hdr, b64] = dataURL.split(',');
       const mime = hdr.match(/data:(image\/[a-zA-Z]+);base64/)[1];
       const ext  = mime.split('/')[1].toLowerCase();
       filenameI.value = `kuva_${Date.now()}.${ext}`;
       fileI.value     = b64;
       fmtI.value      = ext;
-      // Aktivoi lomakkeen Lähetä
       sendBtn.disabled = false;
       sendBtn.classList.remove('opacity-50','cursor-not-allowed');
       openBtn.classList.add('hidden');
     }
 
-    // --- 3) Lähetetään lomakkeella ---
+    // 5) Palauta odotustila lähetettäessä
     form.addEventListener('submit', () => {
       awaitingResponse = true;
       statusDiv.textContent = 'Lähetetään…';
       statusDiv.classList.remove('hidden','error');
     });
 
-    // --- 4) Vastaanota postMessage backendiltä ---
+    // 6) Kuuntele postMessage vastaukset
     window.addEventListener('message', event => {
       if (!awaitingResponse) return;
       awaitingResponse = false;
@@ -151,7 +144,7 @@
         statusDiv.classList.add('error');
       } else {
         statusDiv.textContent =
-          'Tervetuloa turvalliselle työmaalle – ' +
+          'Kiitos! Tervetuloa turvalliselle työmaalle – ' +
           'Hae MVR:n toimistosta "Perehdytetty" tarra';
       }
       setTimeout(() => {
