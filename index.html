@@ -4,50 +4,103 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>MVR Työmaaperehdytys - 2308 SKiB</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { theme: { extend: {} } }
+    tailwind.config = {
+      theme: {
+        extend: {}
+      }
+    }
   </script>
+
+  <!-- Signature Pad -kirjasto -->
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
   <div class="w-full max-w-3xl bg-white shadow-lg rounded-lg overflow-hidden">
     <div class="px-6 py-4">
       <h1 class="text-2xl font-bold mb-6">MVR Työmaaperehdytys - 2308 SKiB</h1>
-      <form id="perehdytyslomake" class="space-y-6" enctype="multipart/form-data" action="https://script.google.com/macros/s/AKfycbx8HcZRpyKQLU3sxMBlj6irl09ZztFoSkLbTxImnTnTcSO5OaS-fiPKGraRKJtHpyYb_Q/exec" method="POST">
+
+      <form
+        id="perehdytyslomake"
+        class="space-y-6"
+        enctype="multipart/form-data"
+        action="https://script.google.com/macros/s/AKfycbx8HcZRpyKQLU3sxMBlj6irl09ZztFoSkLbTxImnTnTcSO5OaS-fiPKGraRKJtHpyYb_Q/exec"
+        method="POST"
+      >
+
         <!-- Step 1 -->
         <div id="step1">
           <h2 class="text-xl font-semibold mb-4">Vaihe 1/2: Lomaketiedot</h2>
-          <!-- Valttikortin numero -->
+
+          <!-- 1. Valttikortin numero -->
           <div>
             <label for="valttinumero" class="block text-gray-700">Valttikortin numero (12 merkkiä):</label>
-            <input id="valttinumero" name="valttinumero" type="text" pattern="[0-9]{12}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="valttinumero"
+              name="valttinumero"
+              type="text"
+              pattern="[0-9]{12}"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Valttikortin kuva -->
+
+          <!-- 1b. Valttikortin kuva -->
           <div>
             <label for="valttikuva" class="block text-gray-700 mt-4">Valttikortin kuva:</label>
-            <input id="valttikuva" name="valttikuva" type="file" accept="image/*" capture="environment" required class="mt-1 block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-700
-              hover:file:bg-blue-100"/>
+            <input
+              id="valttikuva"
+              name="valttikuva"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              required
+              class="mt-1 block w-full text-sm text-gray-500
+                     file:mr-4 file:py-2 file:px-4
+                     file:rounded-full file:border-0
+                     file:text-sm file:font-semibold
+                     file:bg-blue-50 file:text-blue-700
+                     hover:file:bg-blue-100"
+            />
             <img id="valttiPreview" class="mt-2 hidden border rounded w-48 h-auto"/>
           </div>
-          <!-- Veronumero -->
+
+          <!-- 2. Veronumero -->
           <div>
             <label for="veronumero" class="block text-gray-700 mt-4">Veronumero (jos valttikorttia ei ole):</label>
-            <input id="veronumero" name="veronumero" type="text" pattern="[0-9]{12}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="veronumero"
+              name="veronumero"
+              type="text"
+              pattern="[0-9]{12}"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Yritys -->
+
+          <!-- 3. Yritys (Työntekijän palkan maksava yritys) -->
           <div>
             <label for="palkkayar" class="block text-gray-700 mt-4">Yritys (palkan maksava):</label>
-            <input id="palkkayar" name="palkkayar" type="text" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="palkkayar"
+              name="palkkayar"
+              type="text"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Tilaaja -->
+
+          <!-- 4. Tilaaja -->
           <div>
             <label for="tilaaja" class="block text-gray-700 mt-4">Tilaaja:</label>
-            <select id="tilaaja" name="tilaaja" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <select
+              id="tilaaja"
+              name="tilaaja"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            >
               <option value="">Valitse...</option>
               <option>Svenska Kulturfonden i Björneborg -säätiö</option>
               <option>MVR-Yhtymä Oy</option>
@@ -61,35 +114,79 @@
               <option>En tiedä</option>
             </select>
           </div>
-          <!-- Syntymäaika -->
+
+          <!-- 5. Syntymäaika -->
           <div>
             <label for="syntymapaiva" class="block text-gray-700 mt-4">Syntymäaika (pp.kk.vvvv):</label>
-            <input id="syntymapaiva" name="syntymapaiva" type="text" pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4}" required placeholder="pp.kk.vvvv" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="syntymapaiva"
+              name="syntymapaiva"
+              type="text"
+              pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4}"
+              required
+              placeholder="pp.kk.vvvv"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Etunimi -->
+
+          <!-- 6. Etunimi -->
           <div>
             <label for="etunimi" class="block text-gray-700 mt-4">Etunimi:</label>
-            <input id="etunimi" name="etunimi" type="text" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="etunimi"
+              name="etunimi"
+              type="text"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Sukunimi -->
+
+          <!-- 7. Sukunimi -->
           <div>
             <label for="sukunimi" class="block text-gray-700 mt-4">Sukunimi:</label>
-            <input id="sukunimi" name="sukunimi" type="text" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="sukunimi"
+              name="sukunimi"
+              type="text"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Puhelinnumero -->
+
+          <!-- 8. Puhelinnumero -->
           <div>
             <label for="puhelinnumero" class="block text-gray-700 mt-4">Puhelinnumero:</label>
-            <input id="puhelinnumero" name="puhelinnumero" type="tel" required placeholder="+358 44 123 1234" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="puhelinnumero"
+              name="puhelinnumero"
+              type="tel"
+              required
+              placeholder="+358 44 123 1234"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Sähköposti -->
+
+          <!-- 9. Sähköposti -->
           <div>
             <label for="sahkoposti" class="block text-gray-700 mt-4">Sähköposti:</label>
-            <input id="sahkoposti" name="sahkoposti" type="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="sahkoposti"
+              name="sahkoposti"
+              type="email"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Rooli -->
+
+          <!-- 10. Rooli -->
           <div>
             <label for="rooli" class="block text-gray-700 mt-4">Rooli:</label>
-            <select id="rooli" name="rooli" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <select
+              id="rooli"
+              name="rooli"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            >
               <option value="">Valitse...</option>
               <option>Työntekijä</option>
               <option>Työnjohtaja</option>
@@ -100,71 +197,149 @@
               <option>Muu</option>
             </select>
           </div>
-          <!-- Harjoittelijakenttä -->
+
+          <!-- 11. Jos harjoittelija -->
           <div id="harjoKentta" class="hidden">
             <label for="harjoNimi" class="block text-gray-700 mt-4">Koulun yhteyshenkilön nimi:</label>
-            <input id="harjoNimi" name="harjoNimi" type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="harjoNimi"
+              name="harjoNimi"
+              type="text"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
             <label for="harjoPuhelin" class="block text-gray-700 mt-4">Yhteyshenkilön puhelinnumero:</label>
-            <input id="harjoPuhelin" name="harjoPuhelin" type="tel" placeholder="+358..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="harjoPuhelin"
+              name="harjoPuhelin"
+              type="tel"
+              placeholder="+358..."
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Kansalaisuus -->
+
+          <!-- 12. Kansalaisuus -->
           <div>
             <label for="kansalaisuus" class="block text-gray-700 mt-4">Kansalaisuus:</label>
-            <input id="kansalaisuus" name="kansalaisuus" type="text" value="Suomi" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" list="countries"/>
+            <input
+              id="kansalaisuus"
+              name="kansalaisuus"
+              type="text"
+              value="Suomi"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              list="countries"
+            />
             <datalist id="countries">
               <option value="Suomi">
               <option value="Ruotsi">
               <option value="Norja">
               <option value="Saksa">
               <option value="Ranska">
-              <!-- Lisää tarvittaessa -->
             </datalist>
-            <a id="foreignLink" href="https://forms.office.com/e/rSUhYcH6DK" target="_blank" class="hidden text-blue-600 mt-1 block">Suorita perehdytys</a>
+            <a
+              id="foreignLink"
+              href="https://forms.office.com/e/rSUhYcH6DK"
+              target="_blank"
+              class="hidden text-blue-600 mt-1 block"
+            >Suorita perehdytys</a>
           </div>
-          <!-- Pääasiallinen valtio -->
+
+          <!-- 13. Pääasiallinen valtio -->
           <div>
             <label for="paavalti" class="block text-gray-700 mt-4">Pääasiallinen työskentelyvaltio:</label>
-            <input id="paavalti" name="paavalti" type="text" value="Suomi" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" list="countries"/>
+            <input
+              id="paavalti"
+              name="paavalti"
+              type="text"
+              value="Suomi"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              list="countries"
+            />
           </div>
-          <!-- Kieli -->
+
+          <!-- 14. Kieli -->
           <div>
             <label for="kieli" class="block text-gray-700 mt-4">Kieli:</label>
-            <input id="kieli" name="kieli" type="text" value="Suomi" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" list="languages"/>
+            <input
+              id="kieli"
+              name="kieli"
+              type="text"
+              value="Suomi"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              list="languages"
+            />
             <datalist id="languages">
               <option value="Suomi">
               <option value="Ruotsi">
               <option value="Englanti">
               <option value="Saksa">
-              <!-- Lisää -->
             </datalist>
           </div>
-          <!-- Työturvallisuuskortti voimassa -->
+
+          <!-- 15. Työturvallisuuskortti voimassa -->
           <div>
             <label for="tyokorttivoim" class="block text-gray-700 mt-4">Työturvallisuuskortti voimassa:</label>
-            <input id="tyokorttivoim" name="tyokorttivoim" type="month" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="tyokorttivoim"
+              name="tyokorttivoim"
+              type="month"
+              required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Työturvallisuuskortin numero -->
+
+          <!-- 16. Työturvallisuuskortin numero -->
           <div>
             <label for="tyokorttinumero" class="block text-gray-700 mt-4">Työturvallisuuskortin numero:</label>
-            <input id="tyokorttinumero" name="tyokorttinumero" type="text" pattern="[0-9]+" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="tyokorttinumero"
+              name="tyokorttinumero"
+              type="text"
+              pattern="[0-9]+"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Tulityökortti voimassa -->
+
+          <!-- 17. Tulityökortti voimassa -->
           <div>
             <label for="tulityovoim" class="block text-gray-700 mt-4">Tulityökortti voimassa (tarvittaessa):</label>
-            <input id="tulityovoim" name="tulityovoim" type="month" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="tulityovoim"
+              name="tulityovoim"
+              type="month"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
-          <!-- Tulityökortin numero -->
+
+          <!-- 18. Tulityökortin numero -->
           <div>
             <label for="tulityokorttinumero" class="block text-gray-700 mt-4">Tulityökortin numero:</label>
-            <input id="tulityokorttinumero" name="tulityokorttinumero" type="text" pattern="[0-9]+" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"/>
+            <input
+              id="tulityokorttinumero"
+              name="tulityokorttinumero"
+              type="text"
+              pattern="[0-9]+"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+            />
           </div>
+
+          <!-- Next button -->
           <div class="flex justify-end mt-6">
-            <button type="button" id="nextBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Seuraava &gt;</button>
+            <button
+              type="button"
+              id="nextBtn"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >Seuraava &gt;</button>
           </div>
         </div>
+
         <!-- Step 2 -->
         <div id="step2" style="display:none;">
           <h2 class="text-xl font-semibold mb-4">Vaihe 2/2: Yleisinfo ja allekirjoitus</h2>
+
+          <!-- Yleisinfo-osio -->
           <div class="prose max-w-none mb-4">
             <h3>Osa: Kohteen yleisesittely</h3>
             <p>Hankkeen nimi: Bss + SKiB Kampus</p>
@@ -182,24 +357,49 @@
               <li>AU: Trentec Oy</li>
               <li>Sähkö: Mekeltek Oy</li>
             </ul>
-            <!-- Lisää muut osiot tarpeen mukaan -->
+            <!-- Lisää muita osia tarvittaessa -->
           </div>
+
+          <!-- Allekirjoitus -->
           <div>
             <label class="block text-gray-700">Allekirjoita alla:</label>
             <canvas id="signature-pad" class="border border-gray-300 w-full h-48 mt-2"></canvas>
-            <button type="button" id="clear-signature" class="mt-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Tyhjennä allekirjoitus</button>
+            <button
+              type="button"
+              id="clear-signature"
+              class="mt-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            >Tyhjennä allekirjoitus</button>
           </div>
+
+          <!-- Prev & Submit -->
           <div class="flex justify-between mt-6">
-            <button type="button" id="prevBtn" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">&lt; Edellinen</button>
-            <button type="button" id="submitBtn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Lähetä</button>
+            <button
+              type="button"
+              id="prevBtn"
+              class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+            >&lt; Edellinen</button>
+            <button
+              type="button"
+              id="submitBtn"
+              class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            >Lähetä</button>
           </div>
         </div>
+
       </form>
     </div>
   </div>
-  <div id="successMessage" class="fixed inset-0 bg-black bg-opacity-75 text-white flex items-center justify-center text-2xl font-semibold" style="display:none;">
+
+  <!-- Lähetetty-ilmoitus -->
+  <div
+    id="successMessage"
+    class="fixed inset-0 bg-black bg-opacity-75 text-white flex items-center justify-center text-2xl font-semibold"
+    style="display:none;"
+  >
     Olet suorittanut perehdytyksen!
   </div>
+
+  <!-- Oma JS -->
   <script src="script.js"></script>
 </body>
 </html>
