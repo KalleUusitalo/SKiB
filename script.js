@@ -7,11 +7,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const prevBtn = document.getElementById('prevBtn');
   const submitBtn = document.getElementById('submitBtn');
   const successMessage = document.getElementById('successMessage');
+
   // Signature Pad
   const canvas = document.getElementById('signature-pad');
   const signaturePad = new SignaturePad(canvas);
-  document.getElementById('clear-signature').addEventListener('click', ()=>{ signaturePad.clear(); });
-  // Image preview
+  document.getElementById('clear-signature').addEventListener('click', ()=>{
+    signaturePad.clear();
+  });
+
+  // Valttikorttikuvan esikatselu
   const valttiInput = document.getElementById('valttikuva');
   const valttiPreview = document.getElementById('valttiPreview');
   valttiInput.addEventListener('change', e=>{
@@ -21,19 +25,22 @@ document.addEventListener('DOMContentLoaded', ()=>{
       valttiPreview.classList.remove('hidden');
     }
   });
-  // Harjoittelija kenttä visible
+
+  // Näytä harjoittelijan kentät, jos rooliksi valitaan Harjoittelija
   const rooli = document.getElementById('rooli');
   const harjoKentta = document.getElementById('harjoKentta');
   rooli.addEventListener('change', ()=> {
     harjoKentta.classList.toggle('hidden', rooli.value !== 'Harjoittelija');
   });
-  // Kansalaisuus link
+
+  // Näytä foreign-link, jos kansalaisuus != Suomi
   const kansalaisuus = document.getElementById('kansalaisuus');
   const foreignLink = document.getElementById('foreignLink');
   kansalaisuus.addEventListener('input', ()=> {
     foreignLink.classList.toggle('hidden', kansalaisuus.value === 'Suomi');
   });
-  // Navigation
+
+  // Vaiheiden näyttöfunktio
   function showStep(){
     step1.style.display = step===1 ? 'block' : 'none';
     step2.style.display = step===2 ? 'block' : 'none';
@@ -42,30 +49,59 @@ document.addEventListener('DOMContentLoaded', ()=>{
     submitBtn.classList.toggle('hidden', step!==2);
   }
   showStep();
+
+  // Next / Prev
   nextBtn.addEventListener('click', ()=>{
-    if(form.checkValidity()){ step=2; showStep(); }
-    else form.reportValidity();
+    if(form.checkValidity()){ 
+      step = 2; 
+      showStep(); 
+    } else {
+      form.reportValidity();
+    }
   });
-  prevBtn.addEventListener('click', ()=>{ step=1; showStep(); });
-  // Submit
+  prevBtn.addEventListener('click', ()=>{
+    step = 1; 
+    showStep();
+  });
+
+  // Lähetä lomake Apps Scriptiin
   submitBtn.addEventListener('click', async ()=>{
-    if(signaturePad.isEmpty()){ alert('Ole hyvä ja allekirjoita lomake.'); return; }
+    // Varmista, että allekirjoitus on tehty
+    if(signaturePad.isEmpty()){
+      alert('Ole hyvä ja allekirjoita lomake.');
+      return;
+    }
+
+    // Kerää lomaketiedot
     const formData = new FormData(form);
+
+    // Muunna allekirjoitus blobiksi
     const dataURL = signaturePad.toDataURL();
     const blob = await (await fetch(dataURL)).blob();
     formData.append('signature', blob, 'signature.png');
-    fetch(form.action, { method:'POST', body: formData })
-      .then(res=>{
-        if(res.ok){
-          successMessage.style.display = 'flex';
-          setTimeout(()=>{
-            successMessage.style.display = 'none';
-            form.reset();
-            signaturePad.clear();
-            step = 1; showStep();
-            valttiPreview.classList.add('hidden');
-          }, 5000);
-        } else alert('Lähetyksessä tapahtui virhe. Yritä uudelleen.');
-      }).catch(()=> alert('Lähetyksessä tapahtui virhe. Yritä uudelleen.'));
+
+    // Lähetä POST
+    fetch(form.action, {
+      method: 'POST',
+      body: formData
+    })
+    .then(res=>{
+      if(res.ok){
+        // Näytä onnistumisviesti 5 sek
+        successMessage.style.display = 'flex';
+        setTimeout(()=>{
+          successMessage.style.display = 'none';
+          form.reset();
+          signaturePad.clear();
+          step = 1; showStep();
+          valttiPreview.classList.add('hidden');
+        }, 5000);
+      } else {
+        alert('Lähetyksessä tapahtui virhe. Yritä uudelleen.');
+      }
+    })
+    .catch(()=>{
+      alert('Lähetyksessä tapahtui virhe. Yritä uudelleen.');
+    });
   });
 });
