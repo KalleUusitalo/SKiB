@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', () => {
   let step = 1;
   const form = document.getElementById('perehdytyslomake');
   const step1 = document.getElementById('step1');
@@ -11,97 +11,100 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Signature Pad
   const canvas = document.getElementById('signature-pad');
   const signaturePad = new SignaturePad(canvas);
-  document.getElementById('clear-signature').addEventListener('click', ()=>{
+  document.getElementById('clear-signature').addEventListener('click', () => {
     signaturePad.clear();
   });
 
   // Valttikorttikuvan esikatselu
   const valttiInput = document.getElementById('valttikuva');
   const valttiPreview = document.getElementById('valttiPreview');
-  valttiInput.addEventListener('change', e=>{
+  valttiInput.addEventListener('change', e => {
     const file = e.target.files[0];
-    if(file){
+    if (file) {
       valttiPreview.src = URL.createObjectURL(file);
       valttiPreview.classList.remove('hidden');
     }
   });
 
-  // Näytä harjoittelijan kentät, jos rooliksi valitaan Harjoittelija
+  // Harjoittelijan kenttä näkyviin, jos rooli = Harjoittelija
   const rooli = document.getElementById('rooli');
   const harjoKentta = document.getElementById('harjoKentta');
-  rooli.addEventListener('change', ()=> {
+  rooli.addEventListener('change', () => {
     harjoKentta.classList.toggle('hidden', rooli.value !== 'Harjoittelija');
   });
 
-  // Näytä foreign-link, jos kansalaisuus != Suomi
+  // Kansalaisuus-linkki näkyviin, jos muu kuin Suomi
   const kansalaisuus = document.getElementById('kansalaisuus');
   const foreignLink = document.getElementById('foreignLink');
-  kansalaisuus.addEventListener('input', ()=> {
+  kansalaisuus.addEventListener('input', () => {
     foreignLink.classList.toggle('hidden', kansalaisuus.value === 'Suomi');
   });
 
-  // Vaiheiden näyttöfunktio
-  function showStep(){
-    step1.style.display = step===1 ? 'block' : 'none';
-    step2.style.display = step===2 ? 'block' : 'none';
-    nextBtn.classList.toggle('hidden', step!==1);
-    prevBtn.classList.toggle('hidden', step!==2);
-    submitBtn.classList.toggle('hidden', step!==2);
+  // Vaiheiden näyttö
+  function showStep() {
+    step1.style.display = step === 1 ? 'block' : 'none';
+    step2.style.display = step === 2 ? 'block' : 'none';
+    nextBtn.classList.toggle('hidden', step !== 1);
+    prevBtn.classList.toggle('hidden', step !== 2);
+    submitBtn.classList.toggle('hidden', step !== 2);
   }
   showStep();
 
   // Next / Prev
-  nextBtn.addEventListener('click', ()=>{
-    if(form.checkValidity()){ 
-      step = 2; 
-      showStep(); 
+  nextBtn.addEventListener('click', () => {
+    if (form.checkValidity()) {
+      step = 2;
+      showStep();
     } else {
       form.reportValidity();
     }
   });
-  prevBtn.addEventListener('click', ()=>{
-    step = 1; 
+  prevBtn.addEventListener('click', () => {
+    step = 1;
     showStep();
   });
 
   // Lähetä lomake Apps Scriptiin
-  submitBtn.addEventListener('click', async ()=>{
-    // Varmista, että allekirjoitus on tehty
-    if(signaturePad.isEmpty()){
+  submitBtn.addEventListener('click', async () => {
+    // Varmista allekirjoitus
+    if (signaturePad.isEmpty()) {
       alert('Ole hyvä ja allekirjoita lomake.');
       return;
     }
 
-    // Kerää lomaketiedot
+    // Kerää lomakedata
     const formData = new FormData(form);
 
-    // Muunna allekirjoitus blobiksi
+    // Allekirjoitus blobiksi
     const dataURL = signaturePad.toDataURL();
     const blob = await (await fetch(dataURL)).blob();
     formData.append('signature', blob, 'signature.png');
 
-    // Lähetä POST
+    // POST-pyyntö
     fetch(form.action, {
       method: 'POST',
       body: formData
     })
-    .then(res=>{
-      if(res.ok){
-        // Näytä onnistumisviesti 5 sek
+    .then(async res => {
+      const text = await res.text();
+      if (res.ok) {
         successMessage.style.display = 'flex';
-        setTimeout(()=>{
+        setTimeout(() => {
           successMessage.style.display = 'none';
           form.reset();
           signaturePad.clear();
-          step = 1; showStep();
+          step = 1;
+          showStep();
           valttiPreview.classList.add('hidden');
         }, 5000);
       } else {
-        alert('Lähetyksessä tapahtui virhe. Yritä uudelleen.');
+        console.error('Server response:', text);
+        alert('Lähetyksessä tapahtui virhe: ' + text);
       }
     })
-    .catch(()=>{
-      alert('Lähetyksessä tapahtui virhe. Yritä uudelleen.');
+    .catch(err => {
+      console.error('Fetch error:', err);
+      alert('Lähetyksessä tapahtui virhe, tarkista konsoli.');
     });
   });
 });
